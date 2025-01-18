@@ -6,6 +6,15 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C23730DA2D2C88AE00EBA542 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23730D32D2C88AE00EBA542 /* ContentView.swift */; };
+		C23730DB2D2C88AE00EBA542 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23730D42D2C88AE00EBA542 /* Persistence.swift */; };
+		C28D53932D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = C28D53922D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift */; };
+		C28D53942D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = C28D53912D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift */; };
+		C2BDBA562D3C2216005E8E68 /* TimeBoxViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BDBA552D3C2216005E8E68 /* TimeBoxViewModel.swift */; };
+		C2BDBA582D3C2240005E8E68 /* TimeBoxView.swift .swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BDBA572D3C2240005E8E68 /* TimeBoxView.swift .swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		C23730A02D2C85E800EBA542 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +36,12 @@
 		C237308A2D2C85E700EBA542 /* TimeBox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TimeBox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C237309F2D2C85E800EBA542 /* TimeBoxTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TimeBoxTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C23730A92D2C85E800EBA542 /* TimeBoxUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TimeBoxUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C23730D32D2C88AE00EBA542 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		C23730D42D2C88AE00EBA542 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
+		C28D53912D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeBox_Task+CoreDataClass.swift"; sourceTree = "<group>"; };
+		C28D53922D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeBox_Task+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		C2BDBA552D3C2216005E8E68 /* TimeBoxViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeBoxViewModel.swift; sourceTree = "<group>"; };
+		C2BDBA572D3C2240005E8E68 /* TimeBoxView.swift .swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeBoxView.swift .swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +90,11 @@
 		C23730812D2C85E700EBA542 = {
 			isa = PBXGroup;
 			children = (
+				C23730E82D2C89E700EBA542 /* Resources */,
+				C23730E72D2C89E000EBA542 /* Services */,
+				C23730E62D2C89DA00EBA542 /* ViewModels */,
+				C23730E52D2C89D000EBA542 /* Models */,
+				C23730E42D2C89C900EBA542 /* Views */,
 				C237308C2D2C85E700EBA542 /* TimeBox */,
 				C23730A22D2C85E800EBA542 /* TimeBoxTests */,
 				C23730AC2D2C85E800EBA542 /* TimeBoxUITests */,
@@ -90,6 +110,47 @@
 				C23730A92D2C85E800EBA542 /* TimeBoxUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		C23730E42D2C89C900EBA542 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				C23730D32D2C88AE00EBA542 /* ContentView.swift */,
+				C2BDBA572D3C2240005E8E68 /* TimeBoxView.swift .swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		C23730E52D2C89D000EBA542 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				C28D53912D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift */,
+				C28D53922D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		C23730E62D2C89DA00EBA542 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				C2BDBA552D3C2216005E8E68 /* TimeBoxViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		C23730E72D2C89E000EBA542 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				C23730D42D2C88AE00EBA542 /* Persistence.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		C23730E82D2C89E700EBA542 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -236,6 +297,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C23730DA2D2C88AE00EBA542 /* ContentView.swift in Sources */,
+				C2BDBA582D3C2240005E8E68 /* TimeBoxView.swift .swift in Sources */,
+				C23730DB2D2C88AE00EBA542 /* Persistence.swift in Sources */,
+				C28D53932D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift in Sources */,
+				C2BDBA562D3C2216005E8E68 /* TimeBoxViewModel.swift in Sources */,
+				C28D53942D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

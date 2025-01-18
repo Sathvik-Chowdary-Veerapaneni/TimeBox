@@ -1,9 +1,4 @@
-//
-//  TimeBoxApp.swift
-//  TimeBox
-//
-//  Created by Wolverine on 1/6/25.
-//
+// TimeBox/TimeBoxApp.swift
 
 import SwiftUI
 
