@@ -21,6 +21,7 @@ extension TimeBox_Task {
     @NSManaged public var timeAllocated: Double
     @NSManaged public var recurrenceDays: String?
     @NSManaged public var timestamp: Date?
+    @NSManaged public var sortIndex: Int16
 }
 
 extension TimeBox_Task: Identifiable {}
