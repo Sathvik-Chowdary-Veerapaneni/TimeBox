@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct TopPrioritiesContainerView: View {
-    let priorityTasks: [TimeBox_Task]  // Passed in from ContentView
+    let priorityTasks: [TimeBox_Task]
 
     var body: some View {
         ZStack {
@@ -10,18 +10,23 @@ struct TopPrioritiesContainerView: View {
                 .frame(height: 100)
 
             if priorityTasks.isEmpty {
-                // Show a big icon (or any visual) when there's nothing in top priority
-                Image(systemName: "hand.draw")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 50, height: 50)
-                    .foregroundColor(.orange.opacity(0.3))
+                // Show a horizontal arrangement: hand icon + label
+                HStack(spacing: 8) {
+                    Image(systemName: "hand.draw")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 40, height: 40)
+                        .foregroundColor(.orange.opacity(0.3))
+                    
+                    Text("Top 3 Priority tasks")
+                        .font(.headline)
+                        .foregroundColor(.orange)
+                }
             } else {
-                // If we have priority tasks, show them in a scrollable horizontal row
+                // Display a horizontal scroll of up to 3 tasks
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
-                        ForEach(priorityTasks) { task in
-                            // Display each top-priority task as a small “card” or however you like
+                        ForEach(priorityTasks.prefix(3)) { task in
                             PriorityTaskCardView(task: task)
                         }
                     }
@@ -29,7 +34,7 @@ struct TopPrioritiesContainerView: View {
                 }
             }
         }
-        // Animate the appearance/disappearance of the icon when empty vs. filled
+        // Animate switching between empty/not-empty states
         .animation(.easeInOut, value: priorityTasks.count)
     }
 }

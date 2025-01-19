@@ -3,9 +3,8 @@ import CoreData
 
 struct TaskRowCompact: View {
     @ObservedObject var task: TimeBox_Task
-    // Callback for tapping the row
     var tapped: (TimeBox_Task) -> Void
-    
+
     @Environment(\.managedObjectContext) private var viewContext
 
     // Hours info

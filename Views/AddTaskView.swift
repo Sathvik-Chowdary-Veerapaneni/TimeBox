@@ -6,11 +6,10 @@ struct AddTaskView: View {
     @Environment(\.managedObjectContext) private var viewContext
 
     @State private var title = ""
-    @State private var status = ""         // Start empty so no icon is shown
-    @State private var timeAllocated = 0.0 // 0 means "no hours selected" => questionmark icon
-    @State private var desc = ""           // description
-    // resolution not displayed here, can be set in popup
-
+    @State private var status = ""
+    @State private var timeAllocated = 0.0
+    @State private var desc = ""
+    
     private let statusOptions = ["InProgress", "Done", "Postpone"]
     private let hourOptions: [(String, Double)] = [
         ("15m", 0.25), ("30m", 0.5), ("1h", 1.0), ("2h", 2.0), ("3h", 3.0)
@@ -34,7 +33,7 @@ struct AddTaskView: View {
                             Text(option)
                         }
                     }
-
+                    
                     TextEditor(text: $desc)
                         .frame(height: 80)
                         .border(Color.secondary)
@@ -55,7 +54,7 @@ struct AddTaskView: View {
             }
         }
     }
-
+    
     private func addTask() {
         let newTask = TimeBox_Task(context: viewContext)
         newTask.title = title
@@ -65,7 +64,7 @@ struct AddTaskView: View {
         newTask.resolution = nil
         newTask.isInPriorityPool = false
         
-        // Put it at the bottom of the normal list
+        // Place it at the bottom of normal list
         newTask.sortIndex = Int16((try? viewContext.count(for: TimeBox_Task.fetchRequest())) ?? 0)
         
         do {

@@ -1,10 +1,8 @@
 import SwiftUI
 import CoreData
 
-/// A small card that represents a top-priority task in the container.
 struct PriorityTaskCardView: View {
     @ObservedObject var task: TimeBox_Task
-    
     @Environment(\.managedObjectContext) private var viewContext
 
     var body: some View {
@@ -13,11 +11,11 @@ struct PriorityTaskCardView: View {
                 .font(.headline)
                 .foregroundColor(.orange)
                 .padding(.top, 4)
-            
-            // Button to remove from top priority
+
+            // A remove button that returns it to normal list
             Button("Remove") {
                 task.isInPriorityPool = false
-                saveContext()
+                save()
             }
             .font(.caption2)
             .padding(.vertical, 2)
@@ -28,11 +26,11 @@ struct PriorityTaskCardView: View {
         .shadow(radius: 2)
     }
     
-    private func saveContext() {
+    private func save() {
         do {
             try viewContext.save()
         } catch {
-            print("Error saving changes: \(error.localizedDescription)")
+            print("Error removing from top: \(error.localizedDescription)")
         }
     }
 }

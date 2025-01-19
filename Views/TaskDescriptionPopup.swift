@@ -5,7 +5,7 @@ struct TaskDescriptionPopup: View {
     @ObservedObject var task: TimeBox_Task
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var viewContext
-    
+
     var body: some View {
         NavigationView {
             Form {
@@ -18,7 +18,6 @@ struct TaskDescriptionPopup: View {
                     ))
                     .frame(minHeight: 80)
                 }
-
                 Section(header: Text("Resolution")) {
                     TextEditor(text: Binding(
                         get: { task.resolution ?? "" },
