@@ -2,7 +2,8 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23605" systemVersion="24C101" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
     <entity name="TimeBox_Task" representedClassName="TimeBox_Task" syncable="YES">
         <attribute name="desc" optional="YES" attributeType="String"/>
-        <attribute name="priority" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="priorityRank" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="prioritySymbol" optional="YES" attributeType="String"/>
         <attribute name="recurrenceDays" optional="YES" attributeType="String"/>
         <attribute name="resolution" optional="YES" attributeType="String"/>
         <attribute name="sortIndex" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>

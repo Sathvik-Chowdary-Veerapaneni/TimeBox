@@ -16,8 +16,10 @@ extension TimeBox_Task {
     @NSManaged public var sortIndex: Int16
     @NSManaged public var resolution: String?
     @NSManaged public var desc: String?
-    
-    // Removed @NSManaged public var isInPriorityPool: Bool
+
+    // NEW PRIORITY FIELDS:
+    @NSManaged public var prioritySymbol: String?  // "!", "!!", "!!!", or nil
+    @NSManaged public var priorityRank: Int16      // 0=!, 1=!!, 2=!!!, 3=none
 }
 
 extension TimeBox_Task: Identifiable {}
