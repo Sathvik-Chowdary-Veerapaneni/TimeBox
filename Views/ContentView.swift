@@ -5,7 +5,7 @@ import UniformTypeIdentifiers
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
-    // Fetch tasks by priority rank first, then sortIndex
+    // Sort by priorityRank first (so !, !!, !!! are top 3), then by sortIndex.
     @FetchRequest(
         sortDescriptors: [
             NSSortDescriptor(keyPath: \TimeBox_Task.priorityRank, ascending: true),
@@ -20,56 +20,53 @@ struct ContentView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Main list of tasks (already sorted by priority -> sortIndex)
             List {
                 ForEach(tasks) { task in
                     TaskRowCompact(
                         task: task,
-                        allTasks: Array(tasks), // pass entire array for priority checks
-                        tapped: { tappedTask in
-                            selectedTask = tappedTask
-                        }
-                    )
+                        allTasks: Array(tasks)
+                    ) { tappedTask in
+                        selectedTask = tappedTask
+                    }
                 }
                 .onDelete(perform: deleteTasks)
                 .onMove(perform: moveTasks)
             }
+            // The key: re-animate if priorityRank changes
+            .animation(.default, value: tasks.map(\.priorityRank))
             .listStyle(.plain)
 
-            // Add new task
+            // Add New Task button
             Button("Add New Task") {
                 showingAddSheet.toggle()
             }
             .buttonStyle(.borderedProminent)
             .padding()
         }
+        // Sheets for adding/editing tasks
         .sheet(item: $selectedTask) { task in
-            // The same popup you already have for editing descriptions/resolutions
             TaskDescriptionPopup(task: task)
                 .environment(\.managedObjectContext, viewContext)
         }
         .sheet(isPresented: $showingAddSheet) {
-            // The same AddTaskView you already have
             AddTaskView()
                 .environment(\.managedObjectContext, viewContext)
         }
         .toolbar {
-            EditButton() // allows swipe-to-delete, reordering
+            EditButton() // swipe-to-delete and reordering
         }
     }
     
-    // Delete tasks
     private func deleteTasks(at offsets: IndexSet) {
         offsets.map { tasks[$0] }.forEach(viewContext.delete)
         saveContext()
     }
     
-    // Let the user reorder tasks that share the same priority rank
     private func moveTasks(from source: IndexSet, to destination: Int) {
         var updated = Array(tasks)
         updated.move(fromOffsets: source, toOffset: destination)
         
-        // Reassign sortIndex in the new order
+        // Reassign sortIndex in new order
         for (newIndex, t) in updated.enumerated() {
             t.sortIndex = Int16(newIndex)
         }
@@ -80,7 +77,7 @@ struct ContentView: View {
         do {
             try viewContext.save()
         } catch {
-            print("Error saving: \(error.localizedDescription)")
+            print("Error saving: \(error)")
         }
     }
 }

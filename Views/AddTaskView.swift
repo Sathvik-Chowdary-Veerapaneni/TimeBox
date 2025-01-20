@@ -6,66 +6,61 @@ struct AddTaskView: View {
     @Environment(\.managedObjectContext) private var viewContext
 
     @State private var title = ""
-    @State private var status = ""
-    @State private var timeAllocated = 0.0
     @State private var desc = ""
     
-    private let statusOptions = ["InProgress", "Done", "Postpone"]
-    private let hourOptions: [(String, Double)] = [
-        ("15m", 0.25), ("30m", 0.5), ("1h", 1.0), ("2h", 2.0), ("3h", 3.0)
-    ]
+    // Default status for new tasks
+    private let defaultStatus = ""
 
     var body: some View {
         NavigationView {
-            Form {
-                Section {
-                    TextField("Title", text: $title)
-                    
-                    Picker("Time", selection: $timeAllocated) {
-                        ForEach(hourOptions, id: \.0) { (label, value) in
-                            Text(label).tag(value)
-                        }
-                    }
+            VStack(spacing: 8) {
+                TextField("Enter title...", text: $title)
+                    .font(.custom("Helvetica", size: 16))
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.horizontal)
 
-                    Picker("Status", selection: $status) {
-                        Text("None").tag("")
-                        ForEach(statusOptions, id: \.self) { option in
-                            Text(option)
-                        }
-                    }
-                    
-                    TextEditor(text: $desc)
-                        .frame(height: 80)
-                        .border(Color.secondary)
-                }
+                TextEditor(text: $desc)
+                    .font(.custom("Helvetica", size: 16))
+                    .frame(height: 80)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
+                            .padding(.horizontal, -4) // tighten the border
+                    )
+                    .padding(.horizontal, 8)
+
+                // Remove the Spacer() to avoid extra space
             }
-            .navigationTitle("New Task")
+            .padding(.top, 12)
+            .navigationBarTitle("New Task", displayMode: .inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .font(.custom("Helvetica", size: 16))
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         addTask()
                     }
+                    .font(.custom("Helvetica", size: 16))
                 }
             }
         }
+        // Smaller fraction for more compact sheet
+        .presentationDetents([.fraction(0.3)])
     }
     
     private func addTask() {
         let newTask = TimeBox_Task(context: viewContext)
         newTask.title = title
-        newTask.status = status
-        newTask.timeAllocated = timeAllocated
         newTask.desc = desc
-        newTask.resolution = nil
-        
-        // If you still want a sort index:
+        newTask.status = defaultStatus
+
+        // Place new task at bottom of the list
         newTask.sortIndex = Int16((try? viewContext.count(for: TimeBox_Task.fetchRequest())) ?? 0)
-        
+
         do {
             try viewContext.save()
             dismiss()
