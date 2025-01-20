@@ -11,12 +11,9 @@
 		C23730DB2D2C88AE00EBA542 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23730D42D2C88AE00EBA542 /* Persistence.swift */; };
 		C28D53932D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = C28D53922D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift */; };
 		C28D53942D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = C28D53912D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift */; };
-		C2BDBA562D3C2216005E8E68 /* TimeBoxViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BDBA552D3C2216005E8E68 /* TimeBoxViewModel.swift */; };
 		C2BDBA5A2D3C527D005E8E68 /* TaskRowCompact.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BDBA592D3C527D005E8E68 /* TaskRowCompact.swift */; };
 		C2BDBA5C2D3C529E005E8E68 /* AddTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BDBA5B2D3C529E005E8E68 /* AddTaskView.swift */; };
 		C2BDBA5E2D3C52B7005E8E68 /* TaskDescriptionPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BDBA5D2D3C52B7005E8E68 /* TaskDescriptionPopup.swift */; };
-		C2BDBA602D3C52C8005E8E68 /* PriorityTaskCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BDBA5F2D3C52C8005E8E68 /* PriorityTaskCardView.swift */; };
-		C2BDBA622D3C53BB005E8E68 /* TopPrioritiesContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BDBA612D3C53B6005E8E68 /* TopPrioritiesContainerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,12 +41,9 @@
 		C23730D42D2C88AE00EBA542 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		C28D53912D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeBox_Task+CoreDataClass.swift"; sourceTree = "<group>"; };
 		C28D53922D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeBox_Task+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		C2BDBA552D3C2216005E8E68 /* TimeBoxViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeBoxViewModel.swift; sourceTree = "<group>"; };
 		C2BDBA592D3C527D005E8E68 /* TaskRowCompact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRowCompact.swift; sourceTree = "<group>"; };
 		C2BDBA5B2D3C529E005E8E68 /* AddTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTaskView.swift; sourceTree = "<group>"; };
 		C2BDBA5D2D3C52B7005E8E68 /* TaskDescriptionPopup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDescriptionPopup.swift; sourceTree = "<group>"; };
-		C2BDBA5F2D3C52C8005E8E68 /* PriorityTaskCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriorityTaskCardView.swift; sourceTree = "<group>"; };
-		C2BDBA612D3C53B6005E8E68 /* TopPrioritiesContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopPrioritiesContainerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -100,7 +94,6 @@
 			children = (
 				C23730E82D2C89E700EBA542 /* Resources */,
 				C23730E72D2C89E000EBA542 /* Services */,
-				C23730E62D2C89DA00EBA542 /* ViewModels */,
 				C23730E52D2C89D000EBA542 /* Models */,
 				C23730E42D2C89C900EBA542 /* Views */,
 				C237308C2D2C85E700EBA542 /* TimeBox */,
@@ -123,12 +116,10 @@
 		C23730E42D2C89C900EBA542 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				C2BDBA612D3C53B6005E8E68 /* TopPrioritiesContainerView.swift */,
 				C23730D32D2C88AE00EBA542 /* ContentView.swift */,
 				C2BDBA592D3C527D005E8E68 /* TaskRowCompact.swift */,
 				C2BDBA5B2D3C529E005E8E68 /* AddTaskView.swift */,
 				C2BDBA5D2D3C52B7005E8E68 /* TaskDescriptionPopup.swift */,
-				C2BDBA5F2D3C52C8005E8E68 /* PriorityTaskCardView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -140,14 +131,6 @@
 				C28D53922D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift */,
 			);
 			path = Models;
-			sourceTree = "<group>";
-		};
-		C23730E62D2C89DA00EBA542 /* ViewModels */ = {
-			isa = PBXGroup;
-			children = (
-				C2BDBA552D3C2216005E8E68 /* TimeBoxViewModel.swift */,
-			);
-			path = ViewModels;
 			sourceTree = "<group>";
 		};
 		C23730E72D2C89E000EBA542 /* Services */ = {
@@ -312,12 +295,9 @@
 				C2BDBA5E2D3C52B7005E8E68 /* TaskDescriptionPopup.swift in Sources */,
 				C23730DA2D2C88AE00EBA542 /* ContentView.swift in Sources */,
 				C2BDBA5C2D3C529E005E8E68 /* AddTaskView.swift in Sources */,
-				C2BDBA602D3C52C8005E8E68 /* PriorityTaskCardView.swift in Sources */,
-				C2BDBA622D3C53BB005E8E68 /* TopPrioritiesContainerView.swift in Sources */,
 				C2BDBA5A2D3C527D005E8E68 /* TaskRowCompact.swift in Sources */,
 				C23730DB2D2C88AE00EBA542 /* Persistence.swift in Sources */,
 				C28D53932D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift in Sources */,
-				C2BDBA562D3C2216005E8E68 /* TimeBoxViewModel.swift in Sources */,
 				C28D53942D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

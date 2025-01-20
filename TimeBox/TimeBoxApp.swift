@@ -1,5 +1,3 @@
-// TimeBox/TimeBoxApp.swift
-
 import SwiftUI
 
 @main

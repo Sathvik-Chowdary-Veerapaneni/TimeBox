@@ -16,7 +16,7 @@ struct TaskRowCompact: View {
         (3.0,  "3h",  "3.circle.fill")
     ]
     
-    // Ordered statuses to keep them in a fixed order
+    // Ordered statuses
     private let orderedStatuses = ["InProgress", "Done", "Postpone"]
     
     // Status info: icon, color, label
@@ -93,6 +93,7 @@ struct TaskRowCompact: View {
             }
         }
         .padding(8)
+        .frame(maxWidth: .infinity) // Make the row expand
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color(.systemBackground))

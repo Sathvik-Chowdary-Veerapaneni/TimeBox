@@ -1,5 +1,3 @@
-// Services/PersistenceController.swift
-
 import CoreData
 
 struct PersistenceController {

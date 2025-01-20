@@ -62,9 +62,8 @@ struct AddTaskView: View {
         newTask.timeAllocated = timeAllocated
         newTask.desc = desc
         newTask.resolution = nil
-        newTask.isInPriorityPool = false
         
-        // Place it at the bottom of normal list
+        // If you still want a sort index:
         newTask.sortIndex = Int16((try? viewContext.count(for: TimeBox_Task.fetchRequest())) ?? 0)
         
         do {

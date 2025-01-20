@@ -1,11 +1,3 @@
-//
-//  TimeBox_Task+CoreDataProperties.swift
-//  TimeBox
-//
-//  Created by YourName on Date.
-//
-//
-
 import Foundation
 import CoreData
 
@@ -24,7 +16,8 @@ extension TimeBox_Task {
     @NSManaged public var sortIndex: Int16
     @NSManaged public var resolution: String?
     @NSManaged public var desc: String?
-    @NSManaged public var isInPriorityPool: Bool
+    
+    // Removed @NSManaged public var isInPriorityPool: Bool
 }
 
 extension TimeBox_Task: Identifiable {}

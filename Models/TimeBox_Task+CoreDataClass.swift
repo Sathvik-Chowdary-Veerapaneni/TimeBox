@@ -1,5 +1,3 @@
-// TimeBox_Task+CoreDataClass.swift (Models folder)
-
 import Foundation
 import CoreData
 
