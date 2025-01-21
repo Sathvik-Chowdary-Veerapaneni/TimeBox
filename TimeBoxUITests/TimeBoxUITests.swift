@@ -9,35 +9,34 @@ import XCTest
 
 final class TimeBoxUITests: XCTestCase {
 
+    let app = XCUIApplication()
+
     override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-
-        // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
-
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
-    }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    @MainActor
-    func testExample() throws {
-        // UI tests must launch the application that they test.
-        let app = XCUIApplication()
         app.launch()
-
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
 
-    @MainActor
-    func testLaunchPerformance() throws {
-        if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
-            // This measures how long it takes to launch your application.
-            measure(metrics: [XCTApplicationLaunchMetric()]) {
-                XCUIApplication().launch()
-            }
-        }
+    func testAddNewTaskFlow() throws {
+        // 1. Tap "Add New Task" button
+        app.buttons["Add New Task"].tap()
+        
+        // 2. Enter a title in the text field
+        let titleField = app.textFields["Enter title..."]
+        XCTAssertTrue(titleField.waitForExistence(timeout: 5))
+        titleField.tap()
+        titleField.typeText("UITest Demo Task")
+        
+        // 3. Enter some description if needed
+        let descEditor = app.textViews.firstMatch
+        descEditor.tap()
+        descEditor.typeText("This is a test created by UI automation.\n")
+        
+        // 4. Tap "Save"
+        app.buttons["Save"].tap()
+        
+        // 5. Verify new task appears in the list
+        let newTaskCell = app.staticTexts["UITest Demo Task"]
+        XCTAssertTrue(newTaskCell.waitForExistence(timeout: 5),
+                      "New task should appear in the main list.")
     }
 }

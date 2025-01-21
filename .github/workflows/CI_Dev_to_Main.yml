@@ -1,0 +1,29 @@
+name: iOS Build and Test
+
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: macos-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      # (Optional) specify an Xcode version if needed:
+      # - uses: maxim-lobanov/setup-xcode@v2
+      #   with:
+      #     xcode-version: '14.1'
+      
+      - name: Build and Test
+        run: |
+          xcodebuild \
+            -project TimeBox.xcodeproj \
+            -scheme TimeBox \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,OS=16.2,name=iPhone 14' \
+            clean test
