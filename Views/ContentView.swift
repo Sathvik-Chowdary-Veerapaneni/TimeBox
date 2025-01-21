@@ -17,55 +17,73 @@ struct ContentView: View {
     @State private var showingAddSheet = false
     @State private var selectedTask: TimeBox_Task? = nil
     @State private var showProfileSheet = false
+    @State private var showCalendar = false
 
     var body: some View {
-        ZStack(alignment: .topTrailing) {
-            // Main list of tasks
-            List {
-                ForEach(tasks) { task in
-                    TaskRowCompact(
-                        task: task,
-                        allTasks: Array(tasks)
-                    ) { tappedTask in
-                        selectedTask = tappedTask
+        NavigationView {
+            VStack(spacing: 0) {
+                // TOP BAR FOR ICONS
+                HStack {
+                    // Calendar icon
+                    Button {
+                        showCalendar.toggle()
+                    } label: {
+                        Image(systemName: "calendar")
+                            .font(.system(size: 28))
+                            .padding(.leading, 16)
+                    }
+                    
+                    Spacer()
+                    
+                    // Profile icon
+                    Button {
+                        showProfileSheet.toggle()
+                    } label: {
+                        Image(systemName: "person.crop.circle")
+                            .font(.system(size: 35))
+                            .padding(.trailing, 16)
                     }
                 }
-                .onDelete(perform: deleteTasks)
-                .onMove(perform: moveTasks)
-            }
-            .listStyle(.plain)
-            
-            // Profile button pinned top-right
-            VStack {
-                Button {
-                    showProfileSheet.toggle()
-                } label: {
-                    Image(systemName: "person.crop.circle")
-                        .font(.system(size: 40))
-                }
-                .padding(.top, 16)
-                .padding(.trailing, 16)
+                .frame(height: 48)
+                .padding(.top, 8)
                 
-                Spacer()
-            }
-        }
-        .overlay(
-            // Plus button pinned bottom-left
-            VStack {
-                Spacer()
+                Divider() // a thin line under the icons
+                
+                // MAIN TASK LIST
+                List {
+                    ForEach(tasks) { task in
+                        TaskRowCompact(
+                            task: task,
+                            allTasks: Array(tasks)
+                        ) { tappedTask in
+                            selectedTask = tappedTask
+                        }
+                    }
+                    .onDelete(perform: deleteTasks)
+                    .onMove(perform: moveTasks)
+                }
+                .listStyle(.plain)
+                
+                // BOTTOM BAR FOR PLUS BUTTON
                 HStack {
                     Button {
                         showingAddSheet.toggle()
                     } label: {
                         Image(systemName: "plus.circle.fill")
                             .font(.system(size: 48))
+                            .padding(.leading, 16)
                     }
-                    .padding(.leading, 16)
                     Spacer()
                 }
-                .padding(.bottom, 16)
+                .padding(.vertical, 16)
             }
-        )
+            .navigationBarHidden(true) // Hide the default navigation bar
+        }
+        // Show the calendar sheet
+        .sheet(isPresented: $showCalendar) {
+            CalendarView()
+                .environment(\.managedObjectContext, viewContext)
+        }
         // Sheet for tapped tasks
         .sheet(item: $selectedTask) { task in
             TaskDescriptionPopup(task: task)
@@ -80,6 +98,7 @@ struct ContentView: View {
         .sheet(isPresented: $showProfileSheet) {
             ProfileView()
         }
+        // Built-in toolbar for edit/move mode, if desired
         .toolbar {
             EditButton()
         }
@@ -87,7 +106,11 @@ struct ContentView: View {
     
     // MARK: - Helper Methods
     private func deleteTasks(at offsets: IndexSet) {
-        offsets.map { tasks[$0] }.forEach(viewContext.delete)
+        offsets.map { tasks[$0] }.forEach { task in
+            // Also delete from Calendar if needed
+            CalendarService.shared.deleteEvent(for: task, in: viewContext)
+            viewContext.delete(task)
+        }
         saveContext()
     }
     
