@@ -5,7 +5,6 @@ import UniformTypeIdentifiers
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
-    // Sort by priorityRank first (so !, !!, !!! are top 3), then by sortIndex.
     @FetchRequest(
         sortDescriptors: [
             NSSortDescriptor(keyPath: \TimeBox_Task.priorityRank, ascending: true),
@@ -17,48 +16,101 @@ struct ContentView: View {
     
     @State private var showingAddSheet = false
     @State private var selectedTask: TimeBox_Task? = nil
-    
+    @State private var showProfileSheet = false
+    @State private var showCalendar = false
+
     var body: some View {
-        VStack(spacing: 0) {
-            List {
-                ForEach(tasks) { task in
-                    TaskRowCompact(
-                        task: task,
-                        allTasks: Array(tasks)
-                    ) { tappedTask in
-                        selectedTask = tappedTask
+        NavigationView {
+            VStack(spacing: 0) {
+                // TOP BAR FOR ICONS
+                HStack {
+                    // Calendar icon
+                    Button {
+                        showCalendar.toggle()
+                    } label: {
+                        Image(systemName: "calendar")
+                            .font(.system(size: 28))
+                            .padding(.leading, 16)
+                    }
+                    
+                    Spacer()
+                    
+                    // Profile icon
+                    Button {
+                        showProfileSheet.toggle()
+                    } label: {
+                        Image(systemName: "person.crop.circle")
+                            .font(.system(size: 35))
+                            .padding(.trailing, 16)
                     }
                 }
-                .onDelete(perform: deleteTasks)
-                .onMove(perform: moveTasks)
+                .frame(height: 48)
+                .padding(.top, 8)
+                
+                Divider() // a thin line under the icons
+                
+                // MAIN TASK LIST
+                List {
+                    ForEach(tasks) { task in
+                        TaskRowCompact(
+                            task: task,
+                            allTasks: Array(tasks)
+                        ) { tappedTask in
+                            selectedTask = tappedTask
+                        }
+                    }
+                    .onDelete(perform: deleteTasks)
+                    .onMove(perform: moveTasks)
+                }
+                .listStyle(.plain)
+                
+                // BOTTOM BAR FOR PLUS BUTTON
+                HStack {
+                    Button {
+                        showingAddSheet.toggle()
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 48))
+                            .padding(.leading, 16)
+                    }
+                    Spacer()
+                }
+                .padding(.vertical, 16)
             }
-            // The key: re-animate if priorityRank changes
-            .animation(.default, value: tasks.map(\.priorityRank))
-            .listStyle(.plain)
-
-            // Add New Task button
-            Button("Add New Task") {
-                showingAddSheet.toggle()
-            }
-            .buttonStyle(.borderedProminent)
-            .padding()
+            .navigationBarHidden(true) // Hide the default navigation bar
         }
-        // Sheets for adding/editing tasks
+        // Show the calendar sheet
+        .sheet(isPresented: $showCalendar) {
+            CalendarView()
+                .environment(\.managedObjectContext, viewContext)
+        }
+        // Sheet for tapped tasks
         .sheet(item: $selectedTask) { task in
             TaskDescriptionPopup(task: task)
                 .environment(\.managedObjectContext, viewContext)
         }
+        // Sheet to add a new task
         .sheet(isPresented: $showingAddSheet) {
             AddTaskView()
                 .environment(\.managedObjectContext, viewContext)
         }
+        // Sheet for profile settings
+        .sheet(isPresented: $showProfileSheet) {
+            ProfileView()
+        }
+        // Built-in toolbar for edit/move mode, if desired
         .toolbar {
-            EditButton() // swipe-to-delete and reordering
+            EditButton()
         }
     }
     
+    // MARK: - Helper Methods
     private func deleteTasks(at offsets: IndexSet) {
-        offsets.map { tasks[$0] }.forEach(viewContext.delete)
+        offsets.map { tasks[$0] }.forEach { task in
+            // Also delete from Calendar if needed
+            CalendarService.shared.deleteEvent(for: task, in: viewContext)
+            viewContext.delete(task)
+        }
         saveContext()
     }
     
@@ -66,9 +118,8 @@ struct ContentView: View {
         var updated = Array(tasks)
         updated.move(fromOffsets: source, toOffset: destination)
         
-        // Reassign sortIndex in new order
-        for (newIndex, t) in updated.enumerated() {
-            t.sortIndex = Int16(newIndex)
+        for (newIndex, task) in updated.enumerated() {
+            task.sortIndex = Int16(newIndex)
         }
         saveContext()
     }
@@ -77,7 +128,7 @@ struct ContentView: View {
         do {
             try viewContext.save()
         } catch {
-            print("Error saving: \(error)")
+            print("Error saving context: \(error)")
         }
     }
 }

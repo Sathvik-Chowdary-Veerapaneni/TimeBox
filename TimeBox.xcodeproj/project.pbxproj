@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		C23730DA2D2C88AE00EBA542 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23730D32D2C88AE00EBA542 /* ContentView.swift */; };
 		C23730DB2D2C88AE00EBA542 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23730D42D2C88AE00EBA542 /* Persistence.swift */; };
+		C2513FF22D40510A007B4C52 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2513FF12D40510A007B4C52 /* ProfileView.swift */; };
+		C2513FF82D4060B2007B4C52 /* CalendarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2513FF72D4060B2007B4C52 /* CalendarService.swift */; };
+		C2513FFA2D4060F8007B4C52 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2513FF92D4060F8007B4C52 /* CalendarView.swift */; };
 		C28D53932D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = C28D53922D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift */; };
 		C28D53942D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = C28D53912D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift */; };
 		C2BDBA5A2D3C527D005E8E68 /* TaskRowCompact.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BDBA592D3C527D005E8E68 /* TaskRowCompact.swift */; };
@@ -39,6 +42,9 @@
 		C23730A92D2C85E800EBA542 /* TimeBoxUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TimeBoxUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C23730D32D2C88AE00EBA542 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C23730D42D2C88AE00EBA542 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
+		C2513FF12D40510A007B4C52 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		C2513FF72D4060B2007B4C52 /* CalendarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarService.swift; sourceTree = "<group>"; };
+		C2513FF92D4060F8007B4C52 /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
 		C28D53912D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeBox_Task+CoreDataClass.swift"; sourceTree = "<group>"; };
 		C28D53922D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeBox_Task+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		C2BDBA592D3C527D005E8E68 /* TaskRowCompact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRowCompact.swift; sourceTree = "<group>"; };
@@ -60,6 +66,11 @@
 		C23730AC2D2C85E800EBA542 /* TimeBoxUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = TimeBoxUITests;
+			sourceTree = "<group>";
+		};
+		C2513FF32D4055D3007B4C52 /* Challenges_Solving */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Challenges_Solving;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -96,6 +107,7 @@
 				C23730E72D2C89E000EBA542 /* Services */,
 				C23730E52D2C89D000EBA542 /* Models */,
 				C23730E42D2C89C900EBA542 /* Views */,
+				C2513FF32D4055D3007B4C52 /* Challenges_Solving */,
 				C237308C2D2C85E700EBA542 /* TimeBox */,
 				C23730A22D2C85E800EBA542 /* TimeBoxTests */,
 				C23730AC2D2C85E800EBA542 /* TimeBoxUITests */,
@@ -120,6 +132,8 @@
 				C2BDBA592D3C527D005E8E68 /* TaskRowCompact.swift */,
 				C2BDBA5B2D3C529E005E8E68 /* AddTaskView.swift */,
 				C2BDBA5D2D3C52B7005E8E68 /* TaskDescriptionPopup.swift */,
+				C2513FF12D40510A007B4C52 /* ProfileView.swift */,
+				C2513FF92D4060F8007B4C52 /* CalendarView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -137,6 +151,7 @@
 			isa = PBXGroup;
 			children = (
 				C23730D42D2C88AE00EBA542 /* Persistence.swift */,
+				C2513FF72D4060B2007B4C52 /* CalendarService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -165,6 +180,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				C237308C2D2C85E700EBA542 /* TimeBox */,
+				C2513FF32D4055D3007B4C52 /* Challenges_Solving */,
 			);
 			name = TimeBox;
 			packageProductDependencies = (
@@ -292,9 +308,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C2513FF22D40510A007B4C52 /* ProfileView.swift in Sources */,
 				C2BDBA5E2D3C52B7005E8E68 /* TaskDescriptionPopup.swift in Sources */,
 				C23730DA2D2C88AE00EBA542 /* ContentView.swift in Sources */,
+				C2513FFA2D4060F8007B4C52 /* CalendarView.swift in Sources */,
 				C2BDBA5C2D3C529E005E8E68 /* AddTaskView.swift in Sources */,
+				C2513FF82D4060B2007B4C52 /* CalendarService.swift in Sources */,
 				C2BDBA5A2D3C527D005E8E68 /* TaskRowCompact.swift in Sources */,
 				C23730DB2D2C88AE00EBA542 /* Persistence.swift in Sources */,
 				C28D53932D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift in Sources */,
@@ -384,7 +403,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1.1;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -441,7 +460,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1.1;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -467,6 +486,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -496,6 +516,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
