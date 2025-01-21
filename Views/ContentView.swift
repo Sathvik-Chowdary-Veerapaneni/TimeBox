@@ -32,16 +32,23 @@ struct ContentView: View {
                 .onDelete(perform: deleteTasks)
                 .onMove(perform: moveTasks)
             }
-            // The key: re-animate if priorityRank changes
             .animation(.default, value: tasks.map(\.priorityRank))
             .listStyle(.plain)
-
-            // Add New Task button
-            Button("Add New Task") {
-                showingAddSheet.toggle()
+            
+            GeometryReader { proxy in
+                List {
+                    // Your list of tasks
+                }
+                Button {
+                    showingAddSheet.toggle()
+                } label: {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: 60))
+                }
+                .position(x: 60, y: proxy.size.height - 100)
             }
-            .buttonStyle(.borderedProminent)
-            .padding()
+            
+            .padding(.vertical)
         }
         // Sheets for adding/editing tasks
         .sheet(item: $selectedTask) { task in
