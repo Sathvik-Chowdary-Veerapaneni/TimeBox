@@ -7,8 +7,8 @@ struct AddTaskView: View {
 
     @State private var title = ""
     @State private var desc = ""
-    
-    // Default status for new tasks
+    @State private var showEmptyTitleAlert = false
+
     private let defaultStatus = ""
 
     var body: some View {
@@ -25,11 +25,9 @@ struct AddTaskView: View {
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
-                            .padding(.horizontal, -4) // tighten the border
+                            .padding(.horizontal, -4)
                     )
                     .padding(.horizontal, 8)
-
-                // Remove the Spacer() to avoid extra space
             }
             .padding(.top, 12)
             .navigationBarTitle("New Task", displayMode: .inline)
@@ -48,17 +46,25 @@ struct AddTaskView: View {
                 }
             }
         }
-        // Smaller fraction for more compact sheet
         .presentationDetents([.fraction(0.3)])
+        .alert("No Title", isPresented: $showEmptyTitleAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Please add a title for your task.")
+        }
     }
-    
+
     private func addTask() {
+        // Prevent empty titles
+        guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            showEmptyTitleAlert = true
+            return
+        }
+        
         let newTask = TimeBox_Task(context: viewContext)
         newTask.title = title
         newTask.desc = desc
         newTask.status = defaultStatus
-
-        // Place new task at bottom of the list
         newTask.sortIndex = Int16((try? viewContext.count(for: TimeBox_Task.fetchRequest())) ?? 0)
 
         do {
