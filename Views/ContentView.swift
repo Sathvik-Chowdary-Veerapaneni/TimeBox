@@ -5,7 +5,6 @@ import UniformTypeIdentifiers
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
-    // Sort by priorityRank first (so !, !!, !!! are top 3), then by sortIndex.
     @FetchRequest(
         sortDescriptors: [
             NSSortDescriptor(keyPath: \TimeBox_Task.priorityRank, ascending: true),
@@ -17,9 +16,11 @@ struct ContentView: View {
     
     @State private var showingAddSheet = false
     @State private var selectedTask: TimeBox_Task? = nil
-    
+    @State private var showProfileSheet = false
+
     var body: some View {
-        VStack(spacing: 0) {
+        ZStack(alignment: .topTrailing) {
+            // Main list of tasks
             List {
                 ForEach(tasks) { task in
                     TaskRowCompact(
@@ -32,38 +33,59 @@ struct ContentView: View {
                 .onDelete(perform: deleteTasks)
                 .onMove(perform: moveTasks)
             }
-            .animation(.default, value: tasks.map(\.priorityRank))
             .listStyle(.plain)
             
-            GeometryReader { proxy in
-                List {
-                    // Your list of tasks
-                }
+            // Profile button pinned top-right
+            VStack {
                 Button {
-                    showingAddSheet.toggle()
+                    showProfileSheet.toggle()
                 } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 60))
+                    Image(systemName: "person.crop.circle")
+                        .font(.system(size: 40))
                 }
-                .position(x: 60, y: proxy.size.height - 100)
+                .padding(.top, 16)
+                .padding(.trailing, 16)
+                
+                Spacer()
             }
-            
-            .padding(.vertical)
         }
-        // Sheets for adding/editing tasks
+        .overlay(
+            // Plus button pinned bottom-left
+            VStack {
+                Spacer()
+                HStack {
+                    Button {
+                        showingAddSheet.toggle()
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 48))
+                    }
+                    .padding(.leading, 16)
+                    Spacer()
+                }
+                .padding(.bottom, 16)
+            }
+        )
+        // Sheet for tapped tasks
         .sheet(item: $selectedTask) { task in
             TaskDescriptionPopup(task: task)
                 .environment(\.managedObjectContext, viewContext)
         }
+        // Sheet to add a new task
         .sheet(isPresented: $showingAddSheet) {
             AddTaskView()
                 .environment(\.managedObjectContext, viewContext)
         }
+        // Sheet for profile settings
+        .sheet(isPresented: $showProfileSheet) {
+            ProfileView()
+        }
         .toolbar {
-            EditButton() // swipe-to-delete and reordering
+            EditButton()
         }
     }
     
+    // MARK: - Helper Methods
     private func deleteTasks(at offsets: IndexSet) {
         offsets.map { tasks[$0] }.forEach(viewContext.delete)
         saveContext()
@@ -73,9 +95,8 @@ struct ContentView: View {
         var updated = Array(tasks)
         updated.move(fromOffsets: source, toOffset: destination)
         
-        // Reassign sortIndex in new order
-        for (newIndex, t) in updated.enumerated() {
-            t.sortIndex = Int16(newIndex)
+        for (newIndex, task) in updated.enumerated() {
+            task.sortIndex = Int16(newIndex)
         }
         saveContext()
     }
@@ -84,7 +105,7 @@ struct ContentView: View {
         do {
             try viewContext.save()
         } catch {
-            print("Error saving: \(error)")
+            print("Error saving context: \(error)")
         }
     }
 }
