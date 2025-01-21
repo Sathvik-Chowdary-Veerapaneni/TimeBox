@@ -14,11 +14,12 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
+      # Use the official Apple action to select a specific Xcode version
       - name: Set up Xcode
-        uses: maxim-lobanov/setup-xcode@v2
+        uses: apple-actions/setup-xcode@v2
         with:
-          xcode-version: '16.2'  # Set to the Xcode version you are using
-      
+          xcode-version: "16.2"
+
       - name: Build and Test
         run: |
           xcodebuild \
