@@ -5,15 +5,11 @@ import UniformTypeIdentifiers
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
-    @FetchRequest(
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \TimeBox_Task.priorityRank, ascending: true),
-            NSSortDescriptor(keyPath: \TimeBox_Task.sortIndex, ascending: true)
-        ],
-        animation: .default
-    )
-    private var tasks: FetchedResults<TimeBox_Task>
+    // 1. Remove any @FetchRequest code from here
+    // 2. Add an environmentObject ref to our TaskViewModel
+    @EnvironmentObject var taskVM: TaskViewModel
     
+    // Keep your existing states
     @State private var showingAddSheet = false
     @State private var selectedTask: TimeBox_Task? = nil
     @State private var showProfileSheet = false
@@ -51,14 +47,15 @@ struct ContentView: View {
                 
                 // MAIN TASK LIST
                 List {
-                    ForEach(tasks) { task in
+                    ForEach(taskVM.tasks) { task in
                         TaskRowCompact(
                             task: task,
-                            allTasks: Array(tasks)
+                            allTasks: taskVM.tasks
                         ) { tappedTask in
                             selectedTask = tappedTask
                         }
                     }
+                    // 3. Use taskVM for delete/move
                     .onDelete(perform: deleteTasks)
                     .onMove(perform: moveTasks)
                 }
@@ -104,31 +101,14 @@ struct ContentView: View {
         }
     }
     
-    // MARK: - Helper Methods
+    // MARK: - New Wrappers for TaskViewModel
     private func deleteTasks(at offsets: IndexSet) {
-        offsets.map { tasks[$0] }.forEach { task in
-            // Also delete from Calendar if needed
-            CalendarService.shared.deleteEvent(for: task, in: viewContext)
-            viewContext.delete(task)
+        offsets.map { taskVM.tasks[$0] }.forEach { task in
+            taskVM.deleteTask(task)
         }
-        saveContext()
     }
     
     private func moveTasks(from source: IndexSet, to destination: Int) {
-        var updated = Array(tasks)
-        updated.move(fromOffsets: source, toOffset: destination)
-        
-        for (newIndex, task) in updated.enumerated() {
-            task.sortIndex = Int16(newIndex)
-        }
-        saveContext()
-    }
-    
-    private func saveContext() {
-        do {
-            try viewContext.save()
-        } catch {
-            print("Error saving context: \(error)")
-        }
+        taskVM.moveTask(from: source, to: destination)
     }
 }
