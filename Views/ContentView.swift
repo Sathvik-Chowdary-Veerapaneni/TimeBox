@@ -44,25 +44,22 @@ struct ContentView: View {
                 
                 Divider()
                 
-                // MAIN TASK LIST
+                // Shows *today’s tasks* from taskVM
                 List {
                     ForEach(taskVM.tasks, id: \.objectID) { task in
                         TaskRowCompact(
                             task: task,
                             allTasks: taskVM.tasks,
-                            tapped: { tappedTask in
-                                selectedTask = tappedTask
-                            }
+                            tapped: { selectedTask = $0 }
                         )
                     }
                     .onDelete(perform: deleteTasks)
                     .onMove(perform: moveTasks)
                 }
-                // Attach animation to changes in `taskVM.tasks`
                 .animation(.default, value: taskVM.tasks)
                 .listStyle(.plain)
                 
-                // BOTTOM + BUTTON
+                // BOTTOM + PLUS BUTTON
                 HStack {
                     Button {
                         showingAddSheet.toggle()
@@ -77,7 +74,7 @@ struct ContentView: View {
             }
             .navigationBarHidden(true)
         }
-        // SHEETS for Calendar, Profile, AddTask, and Task details
+        // SHEETS
         .sheet(isPresented: $showCalendar) {
             CalendarView()
                 .environment(\.managedObjectContext, viewContext)
@@ -93,18 +90,17 @@ struct ContentView: View {
             AddTaskView()
                 .environment(\.managedObjectContext, viewContext)
         }
-        // EDIT button for reordering/deleting
+        // EDIT button
         .toolbar {
             EditButton()
         }
-        // Fetch the latest tasks on appear
+        // Load ONLY today's tasks on appear
         .onAppear {
-            taskVM.fetchTasks()
+            taskVM.fetchTodayTasks()
         }
     }
     
-    // MARK: - Delete & Move
-    
+    // Delete & Move
     private func deleteTasks(at offsets: IndexSet) {
         offsets.forEach { index in
             let task = taskVM.tasks[index]

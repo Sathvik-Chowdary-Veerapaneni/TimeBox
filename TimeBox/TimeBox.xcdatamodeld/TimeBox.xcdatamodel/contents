@@ -4,6 +4,8 @@
         <attribute name="desc" optional="YES" attributeType="String"/>
         <attribute name="endTime" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="eventIdentifier" optional="YES" attributeType="String"/>
+        <attribute name="postponeDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="postponeReason" optional="YES" attributeType="String"/>
         <attribute name="priorityRank" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="prioritySymbol" optional="YES" attributeType="String"/>
         <attribute name="recurrenceDays" optional="YES" attributeType="String"/>
