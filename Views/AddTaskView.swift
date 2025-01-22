@@ -105,17 +105,35 @@ struct AddTaskView: View {
             return
         }
 
+        // 1) Create the new task
         let newTask = TimeBox_Task(context: viewContext)
         newTask.title = title
-        newTask.desc = desc
+        newTask.desc  = desc
         newTask.status = defaultStatus
         newTask.startTime = finalDate
-        newTask.sortIndex = Int16((try? viewContext.count(for: TimeBox_Task.fetchRequest())) ?? 0)
+        
+        // 2) If it’s unassigned by default, set priorityRank = 3
+        //    Then find the current max sortIndex among other unpinned tasks
+        newTask.priorityRank = 3
+        newTask.prioritySymbol = ""
         
         do {
+            // 3) Fetch all tasks where priorityRank == 3
+            let fetch = NSFetchRequest<TimeBox_Task>(entityName: "TimeBox_Task")
+            fetch.predicate = NSPredicate(format: "priorityRank == 3")
+            
+            let unpinnedTasks = try viewContext.fetch(fetch)
+            // 4) The highest sortIndex among unpinned tasks
+            let maxIndex = unpinnedTasks.map { $0.sortIndex }.max() ?? 0
+            
+            // 5) Place new task at the end
+            newTask.sortIndex = maxIndex + 1
+            
+            // 6) Save the context, update Calendar, then refresh TaskViewModel
             try viewContext.save()
             CalendarService.shared.addEvent(for: newTask, in: viewContext)
             taskVM.fetchTasks()
+            
             dismiss()
         } catch {
             print("Error saving new task: \(error.localizedDescription)")

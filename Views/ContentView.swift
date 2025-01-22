@@ -58,6 +58,8 @@ struct ContentView: View {
                     .onDelete(perform: deleteTasks)
                     .onMove(perform: moveTasks)
                 }
+                // Attach animation to changes in `taskVM.tasks`
+                .animation(.default, value: taskVM.tasks)
                 .listStyle(.plain)
                 
                 // BOTTOM + BUTTON

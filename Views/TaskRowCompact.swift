@@ -7,8 +7,9 @@ struct TaskRowCompact: View {
     var tapped: (TimeBox_Task) -> Void
 
     @Environment(\.managedObjectContext) private var viewContext
+    @EnvironmentObject var taskVM: TaskViewModel  // <-- Access the view model here
     
-    // Existing hours/status arrays...
+    // Existing arrays
     private let hourOptions: [(value: Double, label: String, iconName: String)] = [
         (0.25, "15m", "15.circle.fill"),
         (0.5,  "30m", "30.circle.fill"),
@@ -16,7 +17,6 @@ struct TaskRowCompact: View {
         (2.0,  "2h",  "2.circle.fill"),
         (3.0,  "3h",  "3.circle.fill")
     ]
-    
     private let orderedStatuses = ["InProgress", "Done", "Postpone"]
     private let statusInfo: [String: (iconName: String, color: Color, label: String)] = [
         "InProgress": ("clock.fill", .blue, "In Progress"),
@@ -25,12 +25,6 @@ struct TaskRowCompact: View {
     ]
     
     // Priority logic
-    private let priorityMap: [String: Int16] = [
-        "!":  0,
-        "!!": 1,
-        "!!!":2,
-        "":   3
-    ]
     private let symbolsInOrder = ["!", "!!", "!!!"]
 
     var body: some View {
@@ -43,18 +37,19 @@ struct TaskRowCompact: View {
             
             // PRIORITY MENU
             Menu {
-                // Offer !, !!, !!! if not used by another task
+                // Offer !, !!, !!! if not already used
                 ForEach(symbolsInOrder, id: \.self) { symbol in
                     if canUse(symbol: symbol) {
                         Button(symbol) {
-                            updatePriority(to: symbol)
+                            // Calls TaskViewModel method
+                            taskVM.updatePriority(task, to: symbol)
                         }
                     }
                 }
                 // Option to clear priority if set
                 if !(task.prioritySymbol ?? "").isEmpty {
                     Button("Clear Priority") {
-                        updatePriority(to: "")
+                        taskVM.updatePriority(task, to: "")
                     }
                 }
             } label: {
@@ -68,7 +63,7 @@ struct TaskRowCompact: View {
                 }
             }
             
-            // HOURS MENU (unchanged)
+            // HOURS MENU
             Menu {
                 ForEach(hourOptions, id: \.value) { option in
                     Button {
@@ -94,7 +89,7 @@ struct TaskRowCompact: View {
                 }
             }
             
-            // STATUS MENU (unchanged)
+            // STATUS MENU
             Menu {
                 ForEach(orderedStatuses, id: \.self) { key in
                     if let info = statusInfo[key] {
@@ -126,7 +121,6 @@ struct TaskRowCompact: View {
             }
         }
         .padding(8)
-        .frame(maxWidth: .infinity)
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color(.systemBackground))
@@ -142,20 +136,8 @@ struct TaskRowCompact: View {
 extension TaskRowCompact {
     private func canUse(symbol: String) -> Bool {
         let currentSymbol = task.prioritySymbol ?? ""
-        // If this task already uses it, keep it
         if currentSymbol == symbol { return true }
-        // Otherwise see if any other task is using it
         return !allTasks.contains { $0.prioritySymbol == symbol }
-    }
-    
-    private func updatePriority(to newSymbol: String) {
-        withAnimation {
-            viewContext.perform { // ensure main-thread
-                task.prioritySymbol = newSymbol
-                task.priorityRank   = priorityMap[newSymbol] ?? 3
-                saveChanges()
-            }
-        }
     }
     
     private func saveChanges() {
