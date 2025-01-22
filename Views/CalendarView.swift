@@ -30,10 +30,27 @@ struct CalendarView: View {
                 let days = makeDaysInMonth(currentMonth)
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7)) {
                     ForEach(days, id: \.self) { day in
+                        let isToday = Calendar.current.isDateInToday(day)
+                        let isSelected = Calendar.current.isDate(day, inSameDayAs: selectedDate)
+                        
                         Text("\(Calendar.current.component(.day, from: day))")
-                            .foregroundColor(day < Date().startOfDay ? .gray : .primary)
-                            .padding(8)
+                            .frame(width: 32, height: 32)
+                            // Gray out past days, highlight today in blue, normal days in primary
+                            .foregroundColor(
+                                day < Date().startOfDay
+                                ? .gray
+                                : (isToday ? .white : .primary)
+                            )
+                            // Filled circle for today in solid blue; selected date gets a lighter blue background
+                            .background(
+                                Circle()
+                                    .fill(
+                                        isToday ? .blue
+                                        : (isSelected ? Color.blue.opacity(0.2) : Color.clear)
+                                    )
+                            )
                             .onTapGesture {
+                                // Only allow selecting dates that are today or future
                                 if day >= Date().startOfDay {
                                     selectedDate = day
                                 }
@@ -73,13 +90,14 @@ struct CalendarView: View {
     }
 }
 
+// Keep the existing TaskListForDayView unchanged,
+// it will still fetch and display tasks for the selected day.
 fileprivate extension Date {
     var startOfDay: Date {
         Calendar.current.startOfDay(for: self)
     }
 }
 
-// A subview that shows tasks for a given day
 struct TaskListForDayView: View {
     @Environment(\.managedObjectContext) private var viewContext
     var date: Date

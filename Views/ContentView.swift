@@ -21,7 +21,7 @@ struct ContentView: View {
                     } label: {
                         Image(systemName: "calendar")
                             .font(.title2)
-                            .padding(.leading, 16)
+                            .padding(.leading, 40)
                     }
                     
                     Spacer()
@@ -37,7 +37,7 @@ struct ContentView: View {
                     } label: {
                         Image(systemName: "person.circle")
                             .font(.title2)
-                            .padding(.trailing, 16)
+                            .padding(.trailing, 40)
                     }
                 }
                 .padding(.vertical, 10)
