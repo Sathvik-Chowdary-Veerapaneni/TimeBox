@@ -121,6 +121,7 @@ struct CalendarView: View {
                         )
                     }
                 }
+                .animation(nil, value: dailyTaskCounts) // or tasksForSelectedDate
                 .padding(.horizontal)
                 .frame(maxWidth: .infinity)
                 
@@ -149,11 +150,19 @@ struct CalendarView: View {
                                         .shadow(color: .black.opacity(0.06), radius: 2, x: 0, y: 1)
                                 )
                                 // Provide objectID as plain text for .onDrop
-                                .onDrag {
-                                    let objectIDString = task.objectID.uriRepresentation().absoluteString
-                                    print("DEBUG: onDrag started for:", objectIDString)
-                                    return NSItemProvider(object: objectIDString as NSString)
-                                }
+                                .onDrag(
+                                    {
+                                        // Provide the item to drag
+                                        let objectIDString = task.objectID.uriRepresentation().absoluteString
+                                        let provider = NSItemProvider(object: objectIDString as NSString)
+                                        return provider
+                                    },
+                                    preview: {
+                                        // Provide a minimal or custom view. Here, an invisible 1×1 shape.
+                                        Color.clear
+                                            .frame(width: 1, height: 1)
+                                    }
+                                )
                                 .padding(.horizontal)
                             }
                         }
