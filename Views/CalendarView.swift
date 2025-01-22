@@ -153,8 +153,17 @@ struct CalendarView: View {
                 }
             }
             .navigationTitle("Calendar")
+            // CalendarView.swift (inside .onAppear)
+
             .onAppear {
+                // 1) Set the currentMonth to today (so we see the correct month)
+                currentMonth = Date()
+                // 2) Fetch monthly counts for the new month
                 fetchMonthlyTaskCounts(for: currentMonth)
+                
+                // 3) Automatically select today and load tasks
+                selectedDate = Date()
+                tasksForSelectedDate = fetchTasks(for: Date())
             }
         }
     }
@@ -266,26 +275,36 @@ struct DayCellView: View {
     @State private var isTargeted = false
     
     var body: some View {
+        // Determine if this day is "today," "selected," or "in the past"
         let isToday = Calendar.current.isDateInToday(day)
         let isSelected = Calendar.current.isDate(day, inSameDayAs: selectedDate)
+        let isPast = Calendar.current.startOfDay(for: day)
+                    < Calendar.current.startOfDay(for: Date())
         
         ZStack(alignment: .topTrailing) {
-            // Day number
+            // The main day number
             Text("\(Calendar.current.component(.day, from: day))")
                 .frame(width: 28, height: 28)
                 .foregroundColor(isToday ? .white : .primary)
                 .background(
                     Circle().fill(
                         isToday
-                            ? Color.blue
-                            : (isSelected ? Color.blue.opacity(0.2) : Color.clear)
+                            ? Color.blue                  // Blue circle for "today"
+                            : isSelected
+                                ? Color.blue.opacity(0.2) // Light blue overlay if selected
+                                : isPast
+                                    ? Color.gray.opacity(0.2) // Light gray shading for past days
+                                    : Color.clear              // Future (or present) gets no fill
                     )
                 )
-                .onTapGesture { onTap() }
                 .overlay(
                     RoundedRectangle(cornerRadius: 14)
                         .stroke(Color.gray.opacity(0.4), lineWidth: 0.5)
                 )
+                .onTapGesture {
+                    onTap()
+                }
+                // DRAG-AND-DROP FOR TASKS
                 .onDrop(of: [UTType.plainText], isTargeted: $isTargeted) { providers in
                     guard let itemProvider = providers.first else { return false }
                     itemProvider.loadObject(ofClass: String.self) { string, error in
@@ -307,7 +326,7 @@ struct DayCellView: View {
                 .background(isTargeted ? Color.accentColor.opacity(0.15) : Color.clear)
                 .cornerRadius(4)
             
-            // Red badge for # of tasks
+            // Red badge with the number of tasks
             if dayTaskCount > 0 {
                 Text("\(dayTaskCount)")
                     .font(.system(size: 12, weight: .bold))
