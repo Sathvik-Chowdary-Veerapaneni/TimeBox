@@ -4,15 +4,17 @@ import CoreData
 class TaskViewModel: ObservableObject {
     @Published var tasks: [TimeBox_Task] = []
     
+    // Keep context private to enforce clean architecture
     private let context: NSManagedObjectContext
     
     init(context: NSManagedObjectContext) {
         self.context = context
-        // If you always want to show only today's tasks in this VM,
-        // call fetchTodayTasks() here. Otherwise, do so in your Home view.
+        // If you want only “today’s tasks,” you could call fetchTodayTasks() here
     }
     
-    // Regular fetch (unused if you're only focusing on today's tasks).
+    // MARK: - Fetch Methods
+    
+    // (A) Generic fetch
     func fetchTasks() {
         let request = NSFetchRequest<TimeBox_Task>(entityName: "TimeBox_Task")
         request.sortDescriptors = [
@@ -27,19 +29,18 @@ class TaskViewModel: ObservableObject {
         }
     }
     
-    // **TODAY** fetch: excludes status="Postpone", and tasks whose startTime is outside today's range
+    // (B) Today-only fetch
     func fetchTodayTasks() {
         let request = NSFetchRequest<TimeBox_Task>(entityName: "TimeBox_Task")
         
         let startOfToday = Calendar.current.startOfDay(for: Date())
         guard let endOfToday = Calendar.current.date(byAdding: .day, value: 1, to: startOfToday) else { return }
         
-        // Exclude postponed tasks, and require startTime in [today..tomorrow)
+        // Exclude postponed tasks & require startTime in [today..tomorrow)
         request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             NSPredicate(format: "status != %@", "Postpone"),
             NSPredicate(format: "startTime >= %@ AND startTime < %@", startOfToday as CVarArg, endOfToday as CVarArg)
         ])
-        
         request.sortDescriptors = [
             NSSortDescriptor(key: "priorityRank", ascending: true),
             NSSortDescriptor(key: "sortIndex",    ascending: true)
@@ -53,6 +54,8 @@ class TaskViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Core Data Saves
+    
     func saveChanges() {
         do {
             try context.save()
@@ -61,11 +64,13 @@ class TaskViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Task Updates
+    
     func setTaskStatus(_ task: TimeBox_Task, to newStatus: String) {
         withAnimation {
             task.status = newStatus
             saveChanges()
-            fetchTodayTasks()  // always refresh today's list
+            fetchTodayTasks()
         }
     }
     
@@ -87,7 +92,7 @@ class TaskViewModel: ObservableObject {
         fetchTodayTasks()
     }
     
-    // Reorder tasks while keeping pinned tasks on top
+    // Reorder tasks while keeping pinned tasks (!, !!, !!!) at top
     func moveTasks(from source: IndexSet, to destination: Int) {
         var pinned = tasks.filter { $0.priorityRank < 3 }
         pinned.sort {
@@ -102,14 +107,12 @@ class TaskViewModel: ObservableObject {
         
         let pinnedCount = pinned.count
         
-        // If user tries to drag from or into pinned region, ignore
+        // Ignore any drag crossing pinned/unpinned boundary
         guard
             let firstSource = source.min(),
             firstSource >= pinnedCount,
             destination >= pinnedCount
-        else {
-            return
-        }
+        else { return }
         
         let unpinnedSource = source.map { $0 - pinnedCount }
         let unpinnedDestination = destination - pinnedCount
@@ -124,6 +127,43 @@ class TaskViewModel: ObservableObject {
         withAnimation {
             saveChanges()
             fetchTodayTasks()
+        }
+    }
+    
+    // MARK: - Reschedule for Drag & Drop in CalendarView
+    // Public method that doesn't expose 'context'
+    func rescheduleTask(with objectIDString: String, to newDate: Date) {
+        guard let url = URL(string: objectIDString),
+              let objectID = context.persistentStoreCoordinator?.managedObjectID(forURIRepresentation: url)
+        else {
+            print("Invalid objectID string: \(objectIDString)")
+            return
+        }
+        
+        do {
+            if let task = try context.existingObject(with: objectID) as? TimeBox_Task {
+                // Keep previous hour/min if startTime was set
+                if let oldDate = task.startTime {
+                    var comps = Calendar.current.dateComponents([.hour, .minute], from: oldDate)
+                    comps.year  = Calendar.current.component(.year,  from: newDate)
+                    comps.month = Calendar.current.component(.month, from: newDate)
+                    comps.day   = Calendar.current.component(.day,   from: newDate)
+                    
+                    if let newDateTime = Calendar.current.date(from: comps) {
+                        task.startTime = newDateTime
+                    } else {
+                        task.startTime = Calendar.current.startOfDay(for: newDate)
+                    }
+                } else {
+                    // If no old time, just set the new date
+                    task.startTime = newDate
+                }
+                
+                // Save
+                try context.save()
+            }
+        } catch {
+            print("Error rescheduling task: \(error.localizedDescription)")
         }
     }
 }
