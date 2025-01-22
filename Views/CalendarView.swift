@@ -19,6 +19,9 @@ struct CalendarView: View {
     // The tasks we show in the bottom list
     @State private var tasksForSelectedDate: [TimeBox_Task] = []
     
+    // NEW: A dictionary that holds the number of tasks for each "startOfDay" in the current month
+    @State private var dailyTaskCounts: [Date: Int] = [:]
+    
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
@@ -27,9 +30,10 @@ struct CalendarView: View {
                 HStack {
                     Button("< Prev") {
                         currentMonth = Calendar.current.date(byAdding: .month, value: -1, to: currentMonth) ?? currentMonth
-                        
-                        // DEBUG:
                         print("DEBUG: Moved to previous month:", currentMonth)
+                        
+                        // NEW: Re-fetch counts for the new currentMonth
+                        fetchMonthlyTaskCounts(for: currentMonth)
                     }
                     Spacer()
                     Text(formatMonth(currentMonth))
@@ -37,9 +41,10 @@ struct CalendarView: View {
                     Spacer()
                     Button("Next >") {
                         currentMonth = Calendar.current.date(byAdding: .month, value: 1, to: currentMonth) ?? currentMonth
-                        
-                        // DEBUG:
                         print("DEBUG: Moved to next month:", currentMonth)
+                        
+                        // NEW: Re-fetch counts for the new currentMonth
+                        fetchMonthlyTaskCounts(for: currentMonth)
                     }
                 }
                 .padding()
@@ -49,22 +54,24 @@ struct CalendarView: View {
                 
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 8) {
                     ForEach(days, id: \.self) { day in
+                        let dayOnly = Calendar.current.startOfDay(for: day)
+                        let taskCount = dailyTaskCounts[dayOnly] ?? 0
+                        
                         DayCellView(
                             day: day,
                             selectedDate: selectedDate,
+                            // NEW: Pass the count to the DayCellView
+                            dayTaskCount: taskCount,
                             onTap: {
                                 // When user taps a day, fetch tasks for that day
                                 selectedDate = day
                                 tasksForSelectedDate = fetchTasks(for: day)
-                                
-                                // DEBUG:
                                 print("DEBUG: Tapped day:", day,
                                       "Fetched tasks for:", dateString(day),
                                       "Count:", tasksForSelectedDate.count)
                             },
-                            // Must return Bool to match .onDrop's signature
                             onDropTask: { objectIDString -> Bool in
-                                // DEBUG:
+                                // Drag-and-drop logic here...
                                 print("DEBUG: onDropTask triggered with objectID:", objectIDString)
                                 
                                 // 1) Convert dropped text to an NSManagedObjectID
@@ -78,31 +85,36 @@ struct CalendarView: View {
                                     return false
                                 }
                                 
-                                // 2) Capture old date before changing it
+                                // 2) Capture old date
                                 let oldDate = droppedTask.startTime
                                 print("DEBUG: Found droppedTask with oldDate =", String(describing: oldDate))
                                 
                                 // 3) Update in Core Data & Calendar
                                 taskVM.rescheduleTask(with: objectIDString, to: day)
                                 
-                                // 4) UI update: remove from old date if old date is currently selected
+                                // 4) UI: remove from old date if old date is currently selected
                                 if let oldDate = oldDate,
                                    Calendar.current.isDate(oldDate, inSameDayAs: selectedDate) {
                                     print("DEBUG: Removing droppedTask from tasksForSelectedDate (was on old date).")
                                     tasksForSelectedDate.removeAll { $0.objectID == droppedTask.objectID }
-                                } else {
-                                    print("DEBUG: Old date not currently selected, no removal needed.")
                                 }
                                 
-                                // 5) UI update: if the new date is selected, show the moved task
+                                // 5) UI: if the new date is selected, show the moved task
                                 if Calendar.current.isDate(day, inSameDayAs: selectedDate) {
-                                    print("DEBUG: New date == selectedDate, appending to tasksForSelectedDate.")
                                     tasksForSelectedDate.append(droppedTask)
-                                } else {
-                                    print("DEBUG: New date != selectedDate, not appending to tasksForSelectedDate.")
                                 }
                                 
-                                // DEBUG: Confirm the final count
+                                // NEW: Decrement the old date's count, increment the new date's count
+                                if let oldDate = oldDate {
+                                    let oldKey = Calendar.current.startOfDay(for: oldDate)
+                                    if dailyTaskCounts[oldKey] != nil {
+                                        dailyTaskCounts[oldKey]! = max(0, dailyTaskCounts[oldKey]! - 1)
+                                    }
+                                }
+                                
+                                let newKey = Calendar.current.startOfDay(for: day)
+                                dailyTaskCounts[newKey, default: 0] += 1
+                                
                                 print("DEBUG: tasksForSelectedDate count after drop =", tasksForSelectedDate.count)
                                 return true
                             }
@@ -150,6 +162,10 @@ struct CalendarView: View {
                 }
             }
             .navigationTitle("Calendar")
+            .onAppear {
+                // NEW: When CalendarView first appears, fetch monthly counts
+                fetchMonthlyTaskCounts(for: currentMonth)
+            }
         }
     }
     
@@ -178,26 +194,18 @@ struct CalendarView: View {
         return formatter.string(from: date)
     }
     
-    // Fetch tasks for a single day based on .startTime
+    // Fetch tasks for the currently selected day
     private func fetchTasks(for day: Date) -> [TimeBox_Task] {
         let startOfDay = Calendar.current.startOfDay(for: day)
         guard let endOfDay = Calendar.current.date(byAdding: .day, value: 1, to: startOfDay) else {
             return []
         }
         let request = NSFetchRequest<TimeBox_Task>(entityName: "TimeBox_Task")
-        
-        // If you want to exclude postponed tasks from daily fetches, you might add it here:
-        // request.predicate = NSPredicate(
-        //     format: "startTime >= %@ AND startTime < %@ AND status != %@",
-        //     startOfDay as CVarArg, endOfDay as CVarArg, "Postpone"
-        // )
-        
         request.predicate = NSPredicate(
             format: "startTime >= %@ AND startTime < %@",
             startOfDay as CVarArg,
             endOfDay as CVarArg
         )
-        
         do {
             let fetched = try viewContext.fetch(request)
             print("DEBUG: fetchTasks(for:) got \(fetched.count) items for day:", dateString(day))
@@ -207,16 +215,46 @@ struct CalendarView: View {
             return []
         }
     }
+    
+    // NEW: Fetch all tasks in the month once, then group them by "startOfDay"
+    private func fetchMonthlyTaskCounts(for month: Date) {
+        guard let interval = Calendar.current.dateInterval(of: .month, for: month) else { return }
+        
+        let request = NSFetchRequest<TimeBox_Task>(entityName: "TimeBox_Task")
+        request.predicate = NSPredicate(
+            format: "startTime >= %@ AND startTime < %@",
+            interval.start as CVarArg,
+            interval.end as CVarArg
+        )
+        
+        do {
+            let tasks = try viewContext.fetch(request)
+            var counts: [Date: Int] = [:]
+            for t in tasks {
+                if let st = t.startTime {
+                    let dayOnly = Calendar.current.startOfDay(for: st)
+                    counts[dayOnly, default: 0] += 1
+                }
+            }
+            self.dailyTaskCounts = counts
+            print("DEBUG: fetchMonthlyTaskCounts -> dictionary updated for", formatMonth(month))
+        } catch {
+            print("Error fetching monthly tasks: \(error)")
+            dailyTaskCounts = [:]
+        }
+    }
 }
 
 // MARK: - DayCellView
-/// Single day cell with optional highlight if `day` is "today" or "selected".
 struct DayCellView: View {
     let day: Date
     let selectedDate: Date
     
+    // NEW: We pass the day's task count here
+    let dayTaskCount: Int
+    
     let onTap: () -> Void
-    let onDropTask: (String) -> Bool // Must return Bool to match .onDrop's signature
+    let onDropTask: (String) -> Bool
     
     @State private var isTargeted = false
     
@@ -224,43 +262,82 @@ struct DayCellView: View {
         let isToday = Calendar.current.isDateInToday(day)
         let isSelected = Calendar.current.isDate(day, inSameDayAs: selectedDate)
         
-        Text("\(Calendar.current.component(.day, from: day))")
-            .frame(width: 28, height: 28)
-            .foregroundColor(isToday ? .white : .primary)
-            .background(
-                Circle().fill(
-                    isToday
-                        ? Color.blue
-                        : (isSelected ? Color.blue.opacity(0.2) : Color.clear)
+        ZStack(alignment: .topTrailing) {
+            // The base day text
+            Text("\(Calendar.current.component(.day, from: day))")
+                .frame(width: 28, height: 28)
+                .foregroundColor(isToday ? .white : .primary)
+                .background(
+                    Circle().fill(
+                        isToday
+                            ? Color.blue
+                            : (isSelected ? Color.blue.opacity(0.2) : Color.clear)
+                    )
                 )
-            )
-            .onTapGesture {
-                onTap()
-            }
-            .overlay(
-                RoundedRectangle(cornerRadius: 14)
-                    .stroke(Color.gray.opacity(0.4), lineWidth: 0.5)
-            )
-            .onDrop(of: [UTType.plainText], isTargeted: $isTargeted) { providers in
-                guard let itemProvider = providers.first else { return false }
-                itemProvider.loadObject(ofClass: String.self) { string, error in
-                    if let error = error {
-                        print("DEBUG: loadObject error:", error.localizedDescription)
-                        return
-                    }
-                    guard let objectIDString = string else {
-                        print("DEBUG: Could not cast item to String.")
-                        return
-                    }
-                    DispatchQueue.main.async {
-                        let result = onDropTask(objectIDString)
-                        print("DEBUG: onDropTask closure returned:", result)
-                    }
+                .onTapGesture {
+                    onTap()
                 }
-                return true
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(Color.gray.opacity(0.4), lineWidth: 0.5)
+                )
+                // onDrop for tasks
+                .onDrop(of: [UTType.plainText], isTargeted: $isTargeted) { providers in
+                    guard let itemProvider = providers.first else { return false }
+                    itemProvider.loadObject(ofClass: String.self) { string, error in
+                        if let error = error {
+                            print("DEBUG: loadObject error:", error.localizedDescription)
+                            return
+                        }
+                        guard let objectIDString = string else {
+                            print("DEBUG: Could not cast item to String.")
+                            return
+                        }
+                        DispatchQueue.main.async {
+                            let result = onDropTask(objectIDString)
+                            print("DEBUG: onDropTask closure returned:", result)
+                        }
+                    }
+                    return true
+                }
+                // Slight highlight while dragging
+                .background(isTargeted ? Color.accentColor.opacity(0.15) : Color.clear)
+                .cornerRadius(4)
+            
+            // NEW: Red badge if there's a nonzero count
+            if dayTaskCount > 0 {
+                Text("\(dayTaskCount)")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.white)
+                    .padding(5)
+                    .background(Color.red)
+                    .clipShape(Circle())
+                    // Adjust offset so it sits nicely at top-right
+                    .offset(x: 9.5, y: -10)
             }
-            // Slight highlight while dragging
-            .background(isTargeted ? Color.accentColor.opacity(0.15) : Color.clear)
-            .cornerRadius(4)
+        }
     }
 }
+
+#if DEBUG
+struct CalendarView_Previews: PreviewProvider {
+    static var previews: some View {
+        // 1) Create an in-memory Core Data context for preview
+        let context = PersistenceController(inMemory: true).container.viewContext
+        
+        // 2) Create a mock TaskViewModel with that context
+        let mockTaskVM = TaskViewModel(context: context)
+        
+        // 3) (Optional) Insert some mock tasks to see them in the calendar
+        let sampleTask = TimeBox_Task(context: context)
+        sampleTask.title = "Preview Task"
+        sampleTask.startTime = Date()
+        try? context.save()
+        
+        // 4) Return the CalendarView with environment objects
+        return CalendarView()
+            .environment(\.managedObjectContext, context)
+            .environmentObject(mockTaskVM)
+    }
+}
+#endif
