@@ -15,9 +15,7 @@ struct TimeBoxApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                // 1. Still provide the context, if needed
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                // 2. Provide the TaskViewModel to the entire SwiftUI hierarchy
                 .environmentObject(taskVM)
         }
     }

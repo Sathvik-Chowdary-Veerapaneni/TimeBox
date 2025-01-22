@@ -1,67 +1,66 @@
 import SwiftUI
 import CoreData
-import UniformTypeIdentifiers
 
 struct ContentView: View {
+    @EnvironmentObject var taskVM: TaskViewModel
     @Environment(\.managedObjectContext) private var viewContext
     
-    // 1. Remove any @FetchRequest code from here
-    // 2. Add an environmentObject ref to our TaskViewModel
-    @EnvironmentObject var taskVM: TaskViewModel
-    
-    // Keep your existing states
     @State private var showingAddSheet = false
     @State private var selectedTask: TimeBox_Task? = nil
-    @State private var showProfileSheet = false
+    
     @State private var showCalendar = false
+    @State private var showProfileSheet = false
 
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // TOP BAR FOR ICONS
+                // TOP BAR with Calendar & Profile icons
                 HStack {
-                    // Calendar icon
                     Button {
                         showCalendar.toggle()
                     } label: {
                         Image(systemName: "calendar")
-                            .font(.system(size: 28))
+                            .font(.title2)
                             .padding(.leading, 16)
                     }
                     
                     Spacer()
                     
-                    // Profile icon
+                    Text("HOME")
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                    
+                    Spacer()
+                    
                     Button {
                         showProfileSheet.toggle()
                     } label: {
-                        Image(systemName: "person.crop.circle")
-                            .font(.system(size: 35))
+                        Image(systemName: "person.circle")
+                            .font(.title2)
                             .padding(.trailing, 16)
                     }
                 }
-                .frame(height: 48)
-                .padding(.top, 8)
+                .padding(.vertical, 10)
                 
-                Divider() // a thin line under the icons
+                Divider()
                 
                 // MAIN TASK LIST
                 List {
-                    ForEach(taskVM.tasks) { task in
+                    ForEach(taskVM.tasks, id: \.objectID) { task in
                         TaskRowCompact(
                             task: task,
-                            allTasks: taskVM.tasks
-                        ) { tappedTask in
-                            selectedTask = tappedTask
-                        }
+                            allTasks: taskVM.tasks,
+                            tapped: { tappedTask in
+                                selectedTask = tappedTask
+                            }
+                        )
                     }
-                    // 3. Use taskVM for delete/move
                     .onDelete(perform: deleteTasks)
                     .onMove(perform: moveTasks)
                 }
                 .listStyle(.plain)
                 
-                // BOTTOM BAR FOR PLUS BUTTON
+                // BOTTOM + BUTTON
                 HStack {
                     Button {
                         showingAddSheet.toggle()
@@ -74,41 +73,44 @@ struct ContentView: View {
                 }
                 .padding(.vertical, 16)
             }
-            .navigationBarHidden(true) // Hide the default navigation bar
+            .navigationBarHidden(true)
         }
-        // Show the calendar sheet
+        // SHEETS for Calendar, Profile, AddTask, and Task details
         .sheet(isPresented: $showCalendar) {
             CalendarView()
                 .environment(\.managedObjectContext, viewContext)
         }
-        // Sheet for tapped tasks
+        .sheet(isPresented: $showProfileSheet) {
+            ProfileView()
+        }
         .sheet(item: $selectedTask) { task in
             TaskDescriptionPopup(task: task)
                 .environment(\.managedObjectContext, viewContext)
         }
-        // Sheet to add a new task
         .sheet(isPresented: $showingAddSheet) {
             AddTaskView()
                 .environment(\.managedObjectContext, viewContext)
         }
-        // Sheet for profile settings
-        .sheet(isPresented: $showProfileSheet) {
-            ProfileView()
-        }
-        // Built-in toolbar for edit/move mode, if desired
+        // EDIT button for reordering/deleting
         .toolbar {
             EditButton()
         }
+        // Fetch the latest tasks on appear
+        .onAppear {
+            taskVM.fetchTasks()
+        }
     }
     
-    // MARK: - New Wrappers for TaskViewModel
+    // MARK: - Delete & Move
+    
     private func deleteTasks(at offsets: IndexSet) {
-        offsets.map { taskVM.tasks[$0] }.forEach { task in
+        offsets.forEach { index in
+            let task = taskVM.tasks[index]
             taskVM.deleteTask(task)
         }
     }
     
     private func moveTasks(from source: IndexSet, to destination: Int) {
-        taskVM.moveTask(from: source, to: destination)
+        taskVM.moveTasks(from: source, to: destination)
     }
 }
