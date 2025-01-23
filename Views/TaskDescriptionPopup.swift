@@ -9,6 +9,14 @@ struct TaskDescriptionPopup: View {
     var body: some View {
         NavigationView {
             Form {
+                
+                Section(header: Text("Task")) {
+                        Text(task.title ?? "Untitled")
+                        .font(.headline)
+                            .fontWeight(.semibold)
+                    }
+                
+                
                 Section(header: Text("Description")) {
                     TextEditor(text: Binding(
                         get: { task.desc ?? "" },
@@ -28,7 +36,8 @@ struct TaskDescriptionPopup: View {
                     .frame(minHeight: 80)
                 }
             }
-            .navigationTitle("Task Details")
+            
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Close") {
@@ -53,3 +62,24 @@ struct TaskDescriptionPopup: View {
         }
     }
 }
+
+
+#if DEBUG
+struct TaskDescriptionPopup_Previews: PreviewProvider {
+    static var previews: some View {
+        // 1) Create an in-memory context for preview
+        let context = PersistenceController(inMemory: true).container.viewContext
+        
+        // 2) Insert a sample task
+        let previewTask = TimeBox_Task(context: context)
+        previewTask.title = "Preview Task"
+        previewTask.desc = "Sample description"
+        previewTask.resolution = "Sample resolution"
+        
+        // 3) Show the popup with this sample
+        return TaskDescriptionPopup(task: previewTask)
+            .environment(\.managedObjectContext, context)
+            .preferredColorScheme(.light) // or .dark if you want to test both
+    }
+}
+#endif

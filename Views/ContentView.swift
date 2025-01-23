@@ -1,70 +1,65 @@
 import SwiftUI
 import CoreData
-import UniformTypeIdentifiers
 
 struct ContentView: View {
+    @EnvironmentObject var taskVM: TaskViewModel
     @Environment(\.managedObjectContext) private var viewContext
-    
-    @FetchRequest(
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \TimeBox_Task.priorityRank, ascending: true),
-            NSSortDescriptor(keyPath: \TimeBox_Task.sortIndex, ascending: true)
-        ],
-        animation: .default
-    )
-    private var tasks: FetchedResults<TimeBox_Task>
     
     @State private var showingAddSheet = false
     @State private var selectedTask: TimeBox_Task? = nil
-    @State private var showProfileSheet = false
+    
     @State private var showCalendar = false
+    @State private var showProfileSheet = false
 
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // TOP BAR FOR ICONS
+                // TOP BAR with Calendar & Profile icons
                 HStack {
-                    // Calendar icon
                     Button {
                         showCalendar.toggle()
                     } label: {
                         Image(systemName: "calendar")
-                            .font(.system(size: 28))
-                            .padding(.leading, 16)
+                            .font(.title2)
+                            .padding(.leading, 40)
                     }
                     
                     Spacer()
                     
-                    // Profile icon
+                    Text("HOME")
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                    
+                    Spacer()
+                    
                     Button {
                         showProfileSheet.toggle()
                     } label: {
-                        Image(systemName: "person.crop.circle")
-                            .font(.system(size: 35))
-                            .padding(.trailing, 16)
+                        Image(systemName: "person.circle")
+                            .font(.title2)
+                            .padding(.trailing, 40)
                     }
                 }
-                .frame(height: 48)
-                .padding(.top, 8)
+                .padding(.vertical, 10)
                 
-                Divider() // a thin line under the icons
+                Divider()
                 
-                // MAIN TASK LIST
+                // Shows *today’s tasks* from taskVM
                 List {
-                    ForEach(tasks) { task in
+                    ForEach(taskVM.tasks, id: \.objectID) { task in
                         TaskRowCompact(
                             task: task,
-                            allTasks: Array(tasks)
-                        ) { tappedTask in
-                            selectedTask = tappedTask
-                        }
+                            allTasks: taskVM.tasks,
+                            tapped: { selectedTask = $0 }
+                        )
                     }
                     .onDelete(perform: deleteTasks)
                     .onMove(perform: moveTasks)
                 }
+                .animation(.default, value: taskVM.tasks)
                 .listStyle(.plain)
                 
-                // BOTTOM BAR FOR PLUS BUTTON
+                // BOTTOM + PLUS BUTTON
                 HStack {
                     Button {
                         showingAddSheet.toggle()
@@ -77,58 +72,43 @@ struct ContentView: View {
                 }
                 .padding(.vertical, 16)
             }
-            .navigationBarHidden(true) // Hide the default navigation bar
+            .navigationBarHidden(true)
         }
-        // Show the calendar sheet
+        // SHEETS
         .sheet(isPresented: $showCalendar) {
             CalendarView()
                 .environment(\.managedObjectContext, viewContext)
         }
-        // Sheet for tapped tasks
+        .sheet(isPresented: $showProfileSheet) {
+            ProfileView()
+        }
         .sheet(item: $selectedTask) { task in
             TaskDescriptionPopup(task: task)
                 .environment(\.managedObjectContext, viewContext)
         }
-        // Sheet to add a new task
         .sheet(isPresented: $showingAddSheet) {
             AddTaskView()
                 .environment(\.managedObjectContext, viewContext)
         }
-        // Sheet for profile settings
-        .sheet(isPresented: $showProfileSheet) {
-            ProfileView()
-        }
-        // Built-in toolbar for edit/move mode, if desired
+        // EDIT button
         .toolbar {
             EditButton()
         }
+        // Load ONLY today's tasks on appear
+        .onAppear {
+            taskVM.fetchTodayTasks()
+        }
     }
     
-    // MARK: - Helper Methods
+    // Delete & Move
     private func deleteTasks(at offsets: IndexSet) {
-        offsets.map { tasks[$0] }.forEach { task in
-            // Also delete from Calendar if needed
-            CalendarService.shared.deleteEvent(for: task, in: viewContext)
-            viewContext.delete(task)
+        offsets.forEach { index in
+            let task = taskVM.tasks[index]
+            taskVM.deleteTask(task)
         }
-        saveContext()
     }
     
     private func moveTasks(from source: IndexSet, to destination: Int) {
-        var updated = Array(tasks)
-        updated.move(fromOffsets: source, toOffset: destination)
-        
-        for (newIndex, task) in updated.enumerated() {
-            task.sortIndex = Int16(newIndex)
-        }
-        saveContext()
-    }
-    
-    private func saveContext() {
-        do {
-            try viewContext.save()
-        } catch {
-            print("Error saving context: \(error)")
-        }
+        taskVM.moveTasks(from: source, to: destination)
     }
 }

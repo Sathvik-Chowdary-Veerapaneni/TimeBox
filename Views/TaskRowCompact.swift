@@ -5,10 +5,11 @@ struct TaskRowCompact: View {
     @ObservedObject var task: TimeBox_Task
     let allTasks: [TimeBox_Task]
     var tapped: (TimeBox_Task) -> Void
-
-    @Environment(\.managedObjectContext) private var viewContext
     
-    // Existing hours/status arrays...
+    @Environment(\.managedObjectContext) private var viewContext
+    @EnvironmentObject var taskVM: TaskViewModel
+    
+    // ...
     private let hourOptions: [(value: Double, label: String, iconName: String)] = [
         (0.25, "15m", "15.circle.fill"),
         (0.5,  "30m", "30.circle.fill"),
@@ -16,26 +17,22 @@ struct TaskRowCompact: View {
         (2.0,  "2h",  "2.circle.fill"),
         (3.0,  "3h",  "3.circle.fill")
     ]
-    
     private let orderedStatuses = ["InProgress", "Done", "Postpone"]
     private let statusInfo: [String: (iconName: String, color: Color, label: String)] = [
-        "InProgress": ("clock.fill", .blue, "In Progress"),
-        "Done":       ("checkmark.seal.fill", .green, "Done"),
-        "Postpone":   ("hourglass", .orange, "Postpone")
+        "InProgress": ("clock.fill",     .blue,   "In Progress"),
+        "Done":       ("checkmark.seal.fill", .green,  "Done"),
+        "Postpone":   ("hourglass",      .orange, "Postpone")
     ]
     
-    // Priority logic
-    private let priorityMap: [String: Int16] = [
-        "!":  0,
-        "!!": 1,
-        "!!!":2,
-        "":   3
-    ]
     private let symbolsInOrder = ["!", "!!", "!!!"]
-
+    
+    // State for Postpone popup
+    @State private var showPostponeSheet = false
+    @State private var postponeDate = Date()
+    @State private var postponeReason = ""
+    
     var body: some View {
         HStack(spacing: 12) {
-            // Title
             Text(task.title ?? "Untitled")
                 .font(.headline)
             
@@ -43,18 +40,16 @@ struct TaskRowCompact: View {
             
             // PRIORITY MENU
             Menu {
-                // Offer !, !!, !!! if not used by another task
                 ForEach(symbolsInOrder, id: \.self) { symbol in
                     if canUse(symbol: symbol) {
                         Button(symbol) {
-                            updatePriority(to: symbol)
+                            taskVM.updatePriority(task, to: symbol)
                         }
                     }
                 }
-                // Option to clear priority if set
                 if !(task.prioritySymbol ?? "").isEmpty {
                     Button("Clear Priority") {
-                        updatePriority(to: "")
+                        taskVM.updatePriority(task, to: "")
                     }
                 }
             } label: {
@@ -68,7 +63,7 @@ struct TaskRowCompact: View {
                 }
             }
             
-            // HOURS MENU (unchanged)
+            // HOURS MENU
             Menu {
                 ForEach(hourOptions, id: \.value) { option in
                     Button {
@@ -94,22 +89,28 @@ struct TaskRowCompact: View {
                 }
             }
             
-            // STATUS MENU (unchanged)
+            // STATUS MENU
             Menu {
-                ForEach(orderedStatuses, id: \.self) { key in
-                    if let info = statusInfo[key] {
-                        Button {
-                            task.status = key
-                            saveChanges()
-                        } label: {
-                            Label(info.label, systemImage: info.iconName)
-                                .foregroundColor(info.color)
-                        }
-                    }
+                Button {
+                    taskVM.setTaskStatus(task, to: "InProgress")
+                } label: {
+                    Label("In Progress", systemImage: "clock.fill")
+                }
+                Button {
+                    taskVM.setTaskStatus(task, to: "Done")
+                } label: {
+                    Label("Done", systemImage: "checkmark.seal.fill")
+                }
+                // "Postpone" -> open a sheet
+                Button {
+                    postponeDate = task.startTime ?? Date()
+                    postponeReason = ""
+                    showPostponeSheet = true
+                } label: {
+                    Label("Postpone", systemImage: "hourglass")
                 }
                 Button("Clear Status") {
-                    task.status = ""
-                    saveChanges()
+                    taskVM.setTaskStatus(task, to: "")
                 }
             } label: {
                 let currentStatus = task.status ?? ""
@@ -126,7 +127,6 @@ struct TaskRowCompact: View {
             }
         }
         .padding(8)
-        .frame(maxWidth: .infinity)
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color(.systemBackground))
@@ -135,6 +135,51 @@ struct TaskRowCompact: View {
         .onTapGesture {
             tapped(task)
         }
+        // POSTPONE SHEET
+        .sheet(isPresented: $showPostponeSheet) {
+            NavigationView {
+                Form {
+                    Section(header: Text("Postpone To")) {
+                        DatePicker("Select date/time", selection: $postponeDate, displayedComponents: [.date, .hourAndMinute])
+                            .datePickerStyle(.wheel)
+                    }
+                    Section(header: Text("Reason")) {
+                        TextField("Enter reason...", text: $postponeReason)
+                    }
+                }
+                .navigationTitle("Postpone Task")
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") {
+                            showPostponeSheet = false
+                        }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Save") {
+                            // If user picks a time still “today,” force tomorrow
+                            let startOfToday = Calendar.current.startOfDay(for: Date())
+                            let endOfToday   = Calendar.current.date(byAdding: .day, value: 1, to: startOfToday)!
+                            if postponeDate < endOfToday {
+                                // Force tomorrow at same hour/min
+                                postponeDate = Calendar.current.date(byAdding: .day, value: 1, to: postponeDate)!
+                            }
+                            
+                            // Mark as "Postpone"
+                            task.status = "Postpone"
+                            task.startTime = postponeDate
+                            
+                            task.postponeDate   = postponeDate
+                            task.postponeReason = postponeReason
+                            
+                            saveChanges()
+                            taskVM.fetchTodayTasks()
+                            
+                            showPostponeSheet = false
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -142,20 +187,8 @@ struct TaskRowCompact: View {
 extension TaskRowCompact {
     private func canUse(symbol: String) -> Bool {
         let currentSymbol = task.prioritySymbol ?? ""
-        // If this task already uses it, keep it
         if currentSymbol == symbol { return true }
-        // Otherwise see if any other task is using it
         return !allTasks.contains { $0.prioritySymbol == symbol }
-    }
-    
-    private func updatePriority(to newSymbol: String) {
-        withAnimation {
-            viewContext.perform { // ensure main-thread
-                task.prioritySymbol = newSymbol
-                task.priorityRank   = priorityMap[newSymbol] ?? 3
-                saveChanges()
-            }
-        }
     }
     
     private func saveChanges() {
