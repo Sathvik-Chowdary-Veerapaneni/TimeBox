@@ -12,7 +12,7 @@ struct CalendarView: View {
     @State var selectedDate = Date()
     @State var showBacklog = false
     
-    // For day-based tasks
+    // For normal day tasks
     @State var tasksForSelectedDate: [TimeBox_Task] = []
     @State var dailyTaskCounts: [Date: Int] = [:]
     
@@ -23,28 +23,19 @@ struct CalendarView: View {
         NavigationView {
             VStack(spacing: 0) {
                 
-                // 1) MONTH NAVIGATION
-                HStack {
-                    Button("< Prev") {
+                // 1) TOP Month Navigation
+                MonthNavigationView(
+                    currentMonth: currentMonth,
+                    onPrev: {
                         currentMonth = Calendar.current.date(byAdding: .month, value: -1, to: currentMonth) ?? currentMonth
                         fetchMonthlyTaskCounts(for: currentMonth)
-                    }
-                    Spacer()
-                    
-                    if !showBacklog {
-                        Text(formatMonth(currentMonth))
-                            .font(.headline)
-                    } else {
-                        Text("") // hide month text in backlog mode
-                    }
-                    
-                    Spacer()
-                    Button("Next >") {
+                    },
+                    onNext: {
                         currentMonth = Calendar.current.date(byAdding: .month, value: 1, to: currentMonth) ?? currentMonth
                         fetchMonthlyTaskCounts(for: currentMonth)
-                    }
-                }
-                .padding()
+                    },
+                    showBacklog: showBacklog
+                )
                 
                 // 2) DAYS GRID
                 let daysInMonth = makeDaysInMonth(currentMonth)
@@ -58,15 +49,13 @@ struct CalendarView: View {
                             selectedDate: selectedDate,
                             dayTaskCount: count,
                             onTap: {
-                                // If not showing backlog, select day
                                 if !showBacklog {
                                     selectedDate = day
                                     tasksForSelectedDate = fetchTasks(for: day)
                                 }
                             },
-                            onDropTask: { objectIDString -> Bool in
-                                // Same drag-and-drop logic from your old code
-                                handleDropTask(objectIDString: objectIDString, day: day)
+                            onDropTask: { objectIDString in
+                                handleDropTask(objectIDString, day: day)
                             }
                         )
                     }
@@ -78,13 +67,11 @@ struct CalendarView: View {
                 
                 // 3) BOTTOM
                 if showBacklog {
-                    // Overdue tasks
                     BacklogListView(
                         backlogTasks: $backlogTasks,
                         deleteAction: deleteBacklogTasks
                     )
                 } else {
-                    // Normal daily tasks
                     DayTasksListView(
                         tasksForSelectedDate: $tasksForSelectedDate,
                         selectedDate: selectedDate,
@@ -94,7 +81,7 @@ struct CalendarView: View {
             }
             .navigationTitle(showBacklog ? "OverDue" : "Calendar")
             .onAppear {
-                // Initialize month & day
+                // Initialize
                 currentMonth = Date()
                 fetchMonthlyTaskCounts(for: currentMonth)
                 
@@ -124,52 +111,42 @@ struct CalendarView: View {
     }
     
     // MARK: - Drop Handling
-    func handleDropTask(objectIDString: String, day: Date) -> Bool {
+    func handleDropTask(_ objectIDString: String, day: Date) -> Bool {
         guard
             let url = URL(string: objectIDString),
-            let objID = viewContext.persistentStoreCoordinator?
-                .managedObjectID(forURIRepresentation: url),
+            let objID = viewContext.persistentStoreCoordinator?.managedObjectID(forURIRepresentation: url),
             let droppedTask = try? viewContext.existingObject(with: objID) as? TimeBox_Task
-        else {
-            return false
-        }
+        else { return false }
         
-        // Block if day < today
+        // Disallow if day < today
         let todayStart = Calendar.current.startOfDay(for: Date())
         let thisDay = Calendar.current.startOfDay(for: day)
-        if thisDay < todayStart {
-            print("DEBUG: Disallow drop on a past date.")
-            return false
-        }
+        if thisDay < todayStart { return false }
         
-        // If old date was "today," refresh home so it disappears
         let oldDate = droppedTask.startTime
+        // If old date was today -> remove from home
         if let oldDate = oldDate, Calendar.current.isDate(oldDate, inSameDayAs: Date()) {
-            print("DEBUG: Moved FROM today -> fetchTodayTasks()")
             taskVM.fetchTodayTasks()
         }
         
-        // Actually reschedule
-        print("DEBUG: rescheduleTask -> to day:", day)
+        // Reschedule in Core Data
         taskVM.rescheduleTask(with: objectIDString, to: day)
         
-        // If new date is "today," refresh home so it shows up
+        // If new date is today -> add to home
         if Calendar.current.isDate(day, inSameDayAs: Date()) {
-            print("DEBUG: Moved TO today -> fetchTodayTasks()")
             taskVM.fetchTodayTasks()
         }
         
-        // Remove from old date's local array
+        // UI updates
         if let oldDate = oldDate,
            Calendar.current.isDate(oldDate, inSameDayAs: selectedDate) {
             tasksForSelectedDate.removeAll { $0.objectID == droppedTask.objectID }
         }
-        // If new date matches selected date, add it
         if Calendar.current.isDate(day, inSameDayAs: selectedDate) {
             tasksForSelectedDate.append(droppedTask)
         }
         
-        // Update dailyTaskCounts
+        // Adjust dailyTaskCounts
         if let oldDate = oldDate {
             let oldKey = Calendar.current.startOfDay(for: oldDate)
             if dailyTaskCounts[oldKey] != nil {
@@ -179,7 +156,7 @@ struct CalendarView: View {
         let newKey = Calendar.current.startOfDay(for: day)
         dailyTaskCounts[newKey, default: 0] += 1
         
-        // If backlog is showing, remove from backlog array
+        // If backlog is showing, remove from backlog list
         if showBacklog {
             backlogTasks.removeAll { $0.objectID == droppedTask.objectID }
         }
@@ -188,7 +165,6 @@ struct CalendarView: View {
     }
     
     // MARK: - Deletions
-    
     func deleteBacklogTasks(at offsets: IndexSet) {
         for idx in offsets {
             let task = backlogTasks[idx]
@@ -201,7 +177,6 @@ struct CalendarView: View {
         for idx in offsets {
             let task = tasksForSelectedDate[idx]
             tasksForSelectedDate.remove(at: idx)
-            
             if let st = task.startTime {
                 let key = Calendar.current.startOfDay(for: st)
                 dailyTaskCounts[key] = max(0, (dailyTaskCounts[key] ?? 0) - 1)

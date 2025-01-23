@@ -1,5 +1,4 @@
 // DayCellView.swift
-
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -8,11 +7,7 @@ struct DayCellView: View {
     let selectedDate: Date
     let dayTaskCount: Int
     
-    // Tap to select day
     let onTap: () -> Void
-    
-    // Called when a string (objectID) is dropped on this day
-    // Return `true` if handled
     let onDropTask: (String) -> Bool
     
     @State private var isTargeted = false
@@ -41,33 +36,23 @@ struct DayCellView: View {
                     RoundedRectangle(cornerRadius: 14)
                         .stroke(Color.gray.opacity(0.4), lineWidth: 0.5)
                 )
-                .onTapGesture {
-                    onTap()
-                }
+                // Tapping a day
+                .onTapGesture { onTap() }
                 // DRAG & DROP
                 .onDrop(of: [UTType.plainText], isTargeted: $isTargeted) { providers in
-                    // Disallow dropping on the past
-                    if isPast {
-                        print("DEBUG: Disallow dropping on a past date:", day)
-                        return false
-                    }
+                    if isPast { return false } // disallow dropping on the past
                     guard let provider = providers.first else { return false }
                     provider.loadObject(ofClass: String.self) { objectIDString, error in
-                        if let error = error {
-                            print("DayCellView: loadObject error ->", error)
-                            return
-                        }
+                        if let error = error { print("DayCellView: loadObject error ->", error); return }
                         guard let objectIDString = objectIDString else { return }
-                        // Call onDropTask on the main thread
                         DispatchQueue.main.async {
                             let result = onDropTask(objectIDString)
-                            print("DayCellView: onDropTask =>", result)
+                            print("DayCellView: onDropTask ->", result)
                         }
                     }
                     return true
                 }
             
-            // Task count badge
             if dayTaskCount > 0 {
                 Text("\(dayTaskCount)")
                     .font(.system(size: 12, weight: .bold))
