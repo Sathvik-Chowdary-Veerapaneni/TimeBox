@@ -1,6 +1,8 @@
 import SwiftUI
 import CoreData
 
+// ContentView.swift
+
 struct ContentView: View {
     @EnvironmentObject var taskVM: TaskViewModel
     @Environment(\.managedObjectContext) private var viewContext
@@ -96,7 +98,9 @@ struct ContentView: View {
         }
         // Load ONLY today's tasks on appear
         .onAppear {
+            print("DEBUG: ContentView onAppear -> calling fetchTodayTasks()")
             taskVM.fetchTodayTasks()
+            print("DEBUG: ContentView onAppear -> taskVM.tasks count = \(taskVM.tasks.count)")
         }
     }
     
@@ -104,11 +108,13 @@ struct ContentView: View {
     private func deleteTasks(at offsets: IndexSet) {
         offsets.forEach { index in
             let task = taskVM.tasks[index]
+            print("DEBUG: Deleting task '\(task.title ?? "Untitled")'")
             taskVM.deleteTask(task)
         }
     }
     
     private func moveTasks(from source: IndexSet, to destination: Int) {
+        print("DEBUG: Moving tasks from \(source) to \(destination)")
         taskVM.moveTasks(from: source, to: destination)
     }
 }
