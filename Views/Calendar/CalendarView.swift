@@ -9,7 +9,10 @@ import UniformTypeIdentifiers
 struct CalendarView: View {
     @EnvironmentObject var taskVM: TaskViewModel
     @Environment(\.managedObjectContext) var viewContext
-    
+
+    @State private var selectedTask: TimeBox_Task? = nil
+    @State private var showTaskPopup = false
+
     // Month navigation
     @State  var currentMonth = Date()
     @State  var selectedDate = Date()
@@ -167,34 +170,64 @@ struct CalendarView: View {
                             .frame(maxHeight: .infinity)
                         }
                     } else {
-                        if tasksForSelectedDate.isEmpty {
-                            Text("No tasks for \(dateString(selectedDate)).")
-                                .foregroundColor(.secondary)
-                                .padding()
-                            Spacer()
-                        } else {
-                            List {
-                                ForEach(tasksForSelectedDate, id: \.objectID) { task in
-                                    HStack {
-                                        Text(task.title ?? "Untitled")
-                                            .font(.headline)
-                                        Spacer()
-                                    }
-                                    // Flicker-free drag
-                                    .onDrag(
-                                        {
-                                            let taskID = task.objectID.uriRepresentation().absoluteString
-                                            return NSItemProvider(object: taskID as NSString)
-                                        },
-                                        preview: {
-                                            Color.clear.frame(width: 1, height: 1)
-                                        }
-                                    )
-                                }
-                                .onDelete(perform: deleteTasks)
-                            }
-                            .frame(maxHeight: .infinity)
-                        }
+                       // Normal calendar mode
+if tasksForSelectedDate.isEmpty {
+    Text("No tasks for \(dateString(selectedDate)).")
+        .foregroundColor(.secondary)
+        .padding()
+    Spacer()
+} else {
+    List {
+        ForEach(tasksForSelectedDate, id: \.objectID) { task in
+            HStack(spacing: 8) {
+                // Task name
+                Text(task.title ?? "Untitled")
+                    .font(.headline)
+                
+                Spacer()
+                
+                // Show status icon if any
+                if let status = task.status, !status.isEmpty {
+                    switch status {
+                    case "Done":
+                        Image(systemName: "checkmark.seal.fill")
+                            .foregroundColor(.green)
+                    case "InProgress":
+                        Image(systemName: "clock.fill")
+                            .foregroundColor(.blue)
+                    case "Postpone":
+                        Image(systemName: "hourglass")
+                            .foregroundColor(.orange)
+                    default:
+                        Image(systemName: "questionmark.circle")
+                            .foregroundColor(.gray)
+                    }
+                }
+    
+            }
+            .contentShape(Rectangle()) // Ensures tap/drag works on entire row
+            
+            // 1) Single-tap -> open TaskDescriptionPopup
+            .onTapGesture {
+                selectedTask = task
+                showTaskPopup = true
+            }
+            
+            // 2) Drag & Drop (flicker-free preview)
+            .onDrag(
+                {
+                    let taskID = task.objectID.uriRepresentation().absoluteString
+                    return NSItemProvider(object: taskID as NSString)
+                },
+                preview: {
+                    // Transparent preview
+                    Color.clear.frame(width: 1, height: 1)
+                }
+            )
+        }
+        .onDelete(perform: deleteTasks)
+    }
+}
                     }
                 }
             }
@@ -242,6 +275,11 @@ struct CalendarView: View {
                     }
                 }
             }
+            // After the main VStack, or inside .toolbar, add:
+        .sheet(item: $selectedTask) { task in
+        TaskDescriptionPopup(task: task)
+        .environment(\.managedObjectContext, viewContext)
+}
             // If user tries to move a Done task
             .alert("Cannot Move Done Task",
                    isPresented: $showDoneAlert,
