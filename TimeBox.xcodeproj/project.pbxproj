@@ -14,6 +14,7 @@
 		C2513FFC2D406D73007B4C52 /* TaskViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2513FFB2D406D73007B4C52 /* TaskViewModel.swift */; };
 		C28D53932D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = C28D53922D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift */; };
 		C28D53942D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = C28D53912D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift */; };
+		C2BA21C42D42D231004320E4 /* Predicates.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BA21C32D42D231004320E4 /* Predicates.swift */; };
 		C2BDBA5A2D3C527D005E8E68 /* TaskRowCompact.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BDBA592D3C527D005E8E68 /* TaskRowCompact.swift */; };
 		C2BDBA5C2D3C529E005E8E68 /* AddTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BDBA5B2D3C529E005E8E68 /* AddTaskView.swift */; };
 		C2BDBA5E2D3C52B7005E8E68 /* TaskDescriptionPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BDBA5D2D3C52B7005E8E68 /* TaskDescriptionPopup.swift */; };
@@ -47,6 +48,7 @@
 		C2513FFB2D406D73007B4C52 /* TaskViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskViewModel.swift; sourceTree = "<group>"; };
 		C28D53912D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeBox_Task+CoreDataClass.swift"; sourceTree = "<group>"; };
 		C28D53922D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeBox_Task+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		C2BA21C32D42D231004320E4 /* Predicates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Predicates.swift; sourceTree = "<group>"; };
 		C2BDBA592D3C527D005E8E68 /* TaskRowCompact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRowCompact.swift; sourceTree = "<group>"; };
 		C2BDBA5B2D3C529E005E8E68 /* AddTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTaskView.swift; sourceTree = "<group>"; };
 		C2BDBA5D2D3C52B7005E8E68 /* TaskDescriptionPopup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDescriptionPopup.swift; sourceTree = "<group>"; };
@@ -140,6 +142,7 @@
 				C2BDBA5D2D3C52B7005E8E68 /* TaskDescriptionPopup.swift */,
 				C2513FF12D40510A007B4C52 /* ProfileView.swift */,
 				C2513FFB2D406D73007B4C52 /* TaskViewModel.swift */,
+				C2BA21C32D42D231004320E4 /* Predicates.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -322,6 +325,7 @@
 				C2BDBA5C2D3C529E005E8E68 /* AddTaskView.swift in Sources */,
 				C2513FF82D4060B2007B4C52 /* CalendarService.swift in Sources */,
 				C2BDBA5A2D3C527D005E8E68 /* TaskRowCompact.swift in Sources */,
+				C2BA21C42D42D231004320E4 /* Predicates.swift in Sources */,
 				C23730DB2D2C88AE00EBA542 /* Persistence.swift in Sources */,
 				C28D53932D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift in Sources */,
 				C28D53942D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift in Sources */,
