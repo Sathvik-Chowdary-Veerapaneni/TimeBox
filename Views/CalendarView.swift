@@ -306,6 +306,14 @@ struct DayCellView: View {
                 }
                 // DRAG-AND-DROP FOR TASKS
                 .onDrop(of: [UTType.plainText], isTargeted: $isTargeted) { providers in
+                    let todayStart = Calendar.current.startOfDay(for: Date())
+                        let thisDay    = Calendar.current.startOfDay(for: day)
+                        
+                    guard thisDay >= todayStart else {
+                            print("DEBUG: Cannot drop on a past date.")
+                            return false
+                        }
+                    
                     guard let itemProvider = providers.first else { return false }
                     itemProvider.loadObject(ofClass: String.self) { string, error in
                         if let error = error {
