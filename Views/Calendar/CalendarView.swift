@@ -19,6 +19,9 @@ struct CalendarView: View {
     // For backlog tasks
     @State var backlogTasks: [TimeBox_Task] = []
     
+    //Alert for Future Tasks
+    @State private var showDoneAlert = false
+        
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
@@ -107,6 +110,15 @@ struct CalendarView: View {
                     }
                 }
             }
+             .alert("Cannot Move Done Task",
+                   isPresented: $showDoneAlert,
+                   actions: {
+                       Button("OK", role: .cancel) { }
+                   },
+                   message: {
+                       Text("This task is already marked as 'Done'—please change its status first.")
+                   }
+            )
         }
     }
     
@@ -114,17 +126,29 @@ struct CalendarView: View {
     func handleDropTask(_ objectIDString: String, day: Date) -> Bool {
         guard
             let url = URL(string: objectIDString),
-            let objID = viewContext.persistentStoreCoordinator?.managedObjectID(forURIRepresentation: url),
+            let objID = viewContext.persistentStoreCoordinator?
+                .managedObjectID(forURIRepresentation: url),
             let droppedTask = try? viewContext.existingObject(with: objID) as? TimeBox_Task
         else { return false }
         
-        // Disallow if day < today
+          // If it's Done, show alert & refuse the drop
+        if droppedTask.status == "Done" {
+            print("DEBUG: Task is 'Done' -> cannot move to a future date.")
+            showDoneAlert = true
+            return false
+        }
+        
+        // Disallow dropping on the past
         let todayStart = Calendar.current.startOfDay(for: Date())
         let thisDay = Calendar.current.startOfDay(for: day)
-        if thisDay < todayStart { return false }
+        if thisDay < todayStart {
+            print("DEBUG: Disallow drop on a past date.")
+            return false
+        }
         
         let oldDate = droppedTask.startTime
-        // If old date was today -> remove from home
+        
+        // If old date was today, remove from Home
         if let oldDate = oldDate, Calendar.current.isDate(oldDate, inSameDayAs: Date()) {
             taskVM.fetchTodayTasks()
         }
@@ -132,7 +156,7 @@ struct CalendarView: View {
         // Reschedule in Core Data
         taskVM.rescheduleTask(with: objectIDString, to: day)
         
-        // If new date is today -> add to home
+        // If new date is today, update Home
         if Calendar.current.isDate(day, inSameDayAs: Date()) {
             taskVM.fetchTodayTasks()
         }
@@ -156,7 +180,7 @@ struct CalendarView: View {
         let newKey = Calendar.current.startOfDay(for: day)
         dailyTaskCounts[newKey, default: 0] += 1
         
-        // If backlog is showing, remove from backlog list
+        // If backlog is showing, remove from backlog array
         if showBacklog {
             backlogTasks.removeAll { $0.objectID == droppedTask.objectID }
         }
