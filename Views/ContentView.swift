@@ -1,20 +1,34 @@
+// ContentView.swift
+
 import SwiftUI
 import CoreData
 
 struct ContentView: View {
-    @EnvironmentObject var taskVM: TaskViewModel
     @Environment(\.managedObjectContext) private var viewContext
+    
+    // Instead of your published tasks array, do a @FetchRequest:
+    @FetchRequest(
+        sortDescriptors: [
+            NSSortDescriptor(keyPath: \TimeBox_Task.priorityRank, ascending: true),
+            NSSortDescriptor(keyPath: \TimeBox_Task.sortIndex, ascending: true)
+        ],
+        predicate: .todayPredicate()  // from the extension in Predicates.swift
+    )
+    private var todayTasks: FetchedResults<TimeBox_Task>
+    
+    // If you need TaskViewModel for other things, you can still keep it:
+    @EnvironmentObject var taskVM: TaskViewModel
     
     @State private var showingAddSheet = false
     @State private var selectedTask: TimeBox_Task? = nil
     
     @State private var showCalendar = false
     @State private var showProfileSheet = false
-
+    
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // TOP BAR with Calendar & Profile icons
+                // TOP BAR
                 HStack {
                     Button {
                         showCalendar.toggle()
@@ -44,19 +58,18 @@ struct ContentView: View {
                 
                 Divider()
                 
-                // Shows *today’s tasks* from taskVM
+                // Show "today" tasks from the @FetchRequest:
                 List {
-                    ForEach(taskVM.tasks, id: \.objectID) { task in
+                    ForEach(todayTasks, id: \.objectID) { task in
                         TaskRowCompact(
                             task: task,
-                            allTasks: taskVM.tasks,
+                            allTasks: Array(todayTasks),  // pass an Array if needed
                             tapped: { selectedTask = $0 }
                         )
                     }
                     .onDelete(perform: deleteTasks)
                     .onMove(perform: moveTasks)
                 }
-                .animation(.default, value: taskVM.tasks)
                 .listStyle(.plain)
                 
                 // BOTTOM + PLUS BUTTON
@@ -90,25 +103,41 @@ struct ContentView: View {
             AddTaskView()
                 .environment(\.managedObjectContext, viewContext)
         }
-        // EDIT button
         .toolbar {
             EditButton()
         }
-        // Load ONLY today's tasks on appear
-        .onAppear {
-            taskVM.fetchTodayTasks()
-        }
     }
     
-    // Delete & Move
+    // MARK: - Delete & Move
     private func deleteTasks(at offsets: IndexSet) {
-        offsets.forEach { index in
-            let task = taskVM.tasks[index]
-            taskVM.deleteTask(task)
+        for index in offsets {
+            let task = todayTasks[index]
+            viewContext.delete(task)
         }
+        saveAndRefresh()
     }
     
     private func moveTasks(from source: IndexSet, to destination: Int) {
-        taskVM.moveTasks(from: source, to: destination)
+        // If you need reordering among “todayTasks,” handle it here.
+        // (But you can also rely on your TaskViewModel logic.)
+        print("DEBUG: Move from \(source) to \(destination)")
+        
+        // Example:
+        var tasksArray = Array(todayTasks)
+        tasksArray.move(fromOffsets: source, toOffset: destination)
+        
+        // Reassign sortIndex
+        for (i, t) in tasksArray.enumerated() {
+            t.sortIndex = Int16(i)
+        }
+        saveAndRefresh()
+    }
+    
+    private func saveAndRefresh() {
+        do {
+            try viewContext.save()
+        } catch {
+            print("Error saving: \(error.localizedDescription)")
+        }
     }
 }

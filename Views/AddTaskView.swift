@@ -10,16 +10,15 @@ struct AddTaskView: View {
     @State private var desc = ""
     @State private var showEmptyTitleAlert = false
     
+    // Only a date picker, no time
     @State private var selectedDay = Date()
-    @State private var selectedHour = 12
-    @State private var selectedMinute = 0
-    @State private var selectedMeridiem = "AM"
     
     private let defaultStatus = ""
     
     var body: some View {
         NavigationView {
             Form {
+                // TITLE & DESCRIPTION
                 Section {
                     TextField("Enter title...", text: $title)
                     
@@ -31,42 +30,14 @@ struct AddTaskView: View {
                         )
                 }
                 
+                // ONLY PICK A DAY
                 Section(header: Text("Day")) {
                     DatePicker(
                         "Select Day",
                         selection: $selectedDay,
-                        in: Date()...,
+                        in: Date()...,      // or remove if past is allowed
                         displayedComponents: [.date]
                     )
-                }
-                
-                Section(header: Text("Start Time")) {
-                    HStack(spacing: 16) {
-                        Picker("Hour", selection: $selectedHour) {
-                            ForEach(1..<13) { hour in
-                                Text("\(hour)").tag(hour)
-                            }
-                        }
-                        .pickerStyle(.wheel)
-                        .frame(maxWidth: .infinity)
-
-                        let minuteSteps = stride(from: 0, through: 55, by: 5).map { $0 }
-                        Picker("Minute", selection: $selectedMinute) {
-                            ForEach(minuteSteps, id: \.self) { minute in
-                                Text(String(format: "%02d", minute)).tag(minute)
-                            }
-                        }
-                        .pickerStyle(.wheel)
-                        .frame(maxWidth: .infinity)
-
-                        Picker("AM/PM", selection: $selectedMeridiem) {
-                            Text("AM").tag("AM")
-                            Text("PM").tag("PM")
-                        }
-                        .pickerStyle(.wheel)
-                        .frame(maxWidth: .infinity)
-                    }
-                    .frame(height: 100)
                 }
             }
             .navigationBarTitle("New Task", displayMode: .inline)
@@ -90,31 +61,29 @@ struct AddTaskView: View {
         }
     }
     
+    // MARK: - Add Task
     private func addTask() {
         guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             showEmptyTitleAlert = true
             return
         }
         
-        guard let finalDate = makeCombinedDate(
-            day: selectedDay,
-            hour12: selectedHour,
-            minute: selectedMinute,
-            meridiem: selectedMeridiem
-        ) else {
-            return
-        }
-
+        // Convert user-chosen date to local midnight
+        var calendar = Calendar.current
+        calendar.timeZone = .current
+        let midnightDate = calendar.startOfDay(for: selectedDay)
+        
         // 1) Create the new task
         let newTask = TimeBox_Task(context: viewContext)
         newTask.title = title
         newTask.desc  = desc
         newTask.status = defaultStatus
-        newTask.startTime = finalDate
+        
+        // Store only local midnight in startTime
+        newTask.startTime = midnightDate
         
         // 2) If it’s unassigned by default, set priorityRank = 3
-        //    Then find the current max sortIndex among other unpinned tasks
-        newTask.priorityRank = 3
+        newTask.priorityRank   = 3
         newTask.prioritySymbol = ""
         
         do {
@@ -129,7 +98,7 @@ struct AddTaskView: View {
             // 5) Place new task at the end
             newTask.sortIndex = maxIndex + 1
             
-            // 6) Save the context, update Calendar, then refresh TaskViewModel
+            // 6) Save and refresh
             try viewContext.save()
             CalendarService.shared.addEvent(for: newTask, in: viewContext)
             taskVM.fetchTasks()
@@ -138,16 +107,5 @@ struct AddTaskView: View {
         } catch {
             print("Error saving new task: \(error.localizedDescription)")
         }
-    }
-    
-    private func makeCombinedDate(day: Date, hour12: Int, minute: Int, meridiem: String) -> Date? {
-        var hour24 = hour12 % 12
-        if meridiem == "PM" { hour24 += 12 }
-        
-        var components = Calendar.current.dateComponents([.year, .month, .day], from: day)
-        components.hour = hour24
-        components.minute = minute
-        
-        return Calendar.current.date(from: components)
     }
 }
