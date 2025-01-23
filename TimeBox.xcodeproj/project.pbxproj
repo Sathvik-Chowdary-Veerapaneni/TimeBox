@@ -11,16 +11,9 @@
 		C23730DB2D2C88AE00EBA542 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23730D42D2C88AE00EBA542 /* Persistence.swift */; };
 		C2513FF22D40510A007B4C52 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2513FF12D40510A007B4C52 /* ProfileView.swift */; };
 		C2513FF82D4060B2007B4C52 /* CalendarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2513FF72D4060B2007B4C52 /* CalendarService.swift */; };
-		C2513FFA2D4060F8007B4C52 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2513FF92D4060F8007B4C52 /* CalendarView.swift */; };
 		C2513FFC2D406D73007B4C52 /* TaskViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2513FFB2D406D73007B4C52 /* TaskViewModel.swift */; };
 		C28D53932D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = C28D53922D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift */; };
 		C28D53942D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = C28D53912D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift */; };
-		C2BA21B72D42C0DC004320E4 /*  DayCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BA21B62D42C0DC004320E4 /*  DayCellView.swift */; };
-		C2BA21B92D42C0F6004320E4 /* CalendarView+Logic.swift .swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BA21B82D42C0F6004320E4 /* CalendarView+Logic.swift .swift */; };
-		C2BA21BB2D42C1FA004320E4 /* MonthNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BA21BA2D42C1FA004320E4 /* MonthNavigationView.swift */; };
-		C2BA21BD2D42C209004320E4 /* BacklogListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BA21BC2D42C209004320E4 /* BacklogListView.swift */; };
-		C2BA21BF2D42C21B004320E4 /* DayTasksListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BA21BE2D42C21B004320E4 /* DayTasksListView.swift */; };
-		C2BA21C12D42C504004320E4 /* TaskListViews.swift .swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BA21C02D42C504004320E4 /* TaskListViews.swift .swift */; };
 		C2BDBA5A2D3C527D005E8E68 /* TaskRowCompact.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BDBA592D3C527D005E8E68 /* TaskRowCompact.swift */; };
 		C2BDBA5C2D3C529E005E8E68 /* AddTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BDBA5B2D3C529E005E8E68 /* AddTaskView.swift */; };
 		C2BDBA5E2D3C52B7005E8E68 /* TaskDescriptionPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BDBA5D2D3C52B7005E8E68 /* TaskDescriptionPopup.swift */; };
@@ -51,16 +44,9 @@
 		C23730D42D2C88AE00EBA542 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		C2513FF12D40510A007B4C52 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		C2513FF72D4060B2007B4C52 /* CalendarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarService.swift; sourceTree = "<group>"; };
-		C2513FF92D4060F8007B4C52 /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
 		C2513FFB2D406D73007B4C52 /* TaskViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskViewModel.swift; sourceTree = "<group>"; };
 		C28D53912D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeBox_Task+CoreDataClass.swift"; sourceTree = "<group>"; };
 		C28D53922D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeBox_Task+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		C2BA21B62D42C0DC004320E4 /*  DayCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = " DayCellView.swift"; sourceTree = "<group>"; };
-		C2BA21B82D42C0F6004320E4 /* CalendarView+Logic.swift .swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CalendarView+Logic.swift .swift"; sourceTree = "<group>"; };
-		C2BA21BA2D42C1FA004320E4 /* MonthNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthNavigationView.swift; sourceTree = "<group>"; };
-		C2BA21BC2D42C209004320E4 /* BacklogListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogListView.swift; sourceTree = "<group>"; };
-		C2BA21BE2D42C21B004320E4 /* DayTasksListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayTasksListView.swift; sourceTree = "<group>"; };
-		C2BA21C02D42C504004320E4 /* TaskListViews.swift .swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskListViews.swift .swift"; sourceTree = "<group>"; };
 		C2BDBA592D3C527D005E8E68 /* TaskRowCompact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRowCompact.swift; sourceTree = "<group>"; };
 		C2BDBA5B2D3C529E005E8E68 /* AddTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTaskView.swift; sourceTree = "<group>"; };
 		C2BDBA5D2D3C52B7005E8E68 /* TaskDescriptionPopup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDescriptionPopup.swift; sourceTree = "<group>"; };
@@ -85,6 +71,11 @@
 		C2513FF32D4055D3007B4C52 /* Challenges_Solving */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Challenges_Solving;
+			sourceTree = "<group>";
+		};
+		C2BA21C22D42CB95004320E4 /* Calendar */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Calendar;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -142,19 +133,13 @@
 		C23730E42D2C89C900EBA542 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C2BA21C22D42CB95004320E4 /* Calendar */,
 				C23730D32D2C88AE00EBA542 /* ContentView.swift */,
 				C2BDBA592D3C527D005E8E68 /* TaskRowCompact.swift */,
 				C2BDBA5B2D3C529E005E8E68 /* AddTaskView.swift */,
 				C2BDBA5D2D3C52B7005E8E68 /* TaskDescriptionPopup.swift */,
 				C2513FF12D40510A007B4C52 /* ProfileView.swift */,
-				C2513FF92D4060F8007B4C52 /* CalendarView.swift */,
 				C2513FFB2D406D73007B4C52 /* TaskViewModel.swift */,
-				C2BA21B62D42C0DC004320E4 /*  DayCellView.swift */,
-				C2BA21B82D42C0F6004320E4 /* CalendarView+Logic.swift .swift */,
-				C2BA21BA2D42C1FA004320E4 /* MonthNavigationView.swift */,
-				C2BA21BC2D42C209004320E4 /* BacklogListView.swift */,
-				C2BA21BE2D42C21B004320E4 /* DayTasksListView.swift */,
-				C2BA21C02D42C504004320E4 /* TaskListViews.swift .swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -202,6 +187,7 @@
 			fileSystemSynchronizedGroups = (
 				C237308C2D2C85E700EBA542 /* TimeBox */,
 				C2513FF32D4055D3007B4C52 /* Challenges_Solving */,
+				C2BA21C22D42CB95004320E4 /* Calendar */,
 			);
 			name = TimeBox;
 			packageProductDependencies = (
@@ -329,20 +315,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C2BA21BF2D42C21B004320E4 /* DayTasksListView.swift in Sources */,
-				C2BA21BB2D42C1FA004320E4 /* MonthNavigationView.swift in Sources */,
 				C2513FFC2D406D73007B4C52 /* TaskViewModel.swift in Sources */,
 				C2513FF22D40510A007B4C52 /* ProfileView.swift in Sources */,
 				C2BDBA5E2D3C52B7005E8E68 /* TaskDescriptionPopup.swift in Sources */,
-				C2BA21C12D42C504004320E4 /* TaskListViews.swift .swift in Sources */,
-				C2BA21B92D42C0F6004320E4 /* CalendarView+Logic.swift .swift in Sources */,
 				C23730DA2D2C88AE00EBA542 /* ContentView.swift in Sources */,
-				C2BA21B72D42C0DC004320E4 /*  DayCellView.swift in Sources */,
-				C2513FFA2D4060F8007B4C52 /* CalendarView.swift in Sources */,
 				C2BDBA5C2D3C529E005E8E68 /* AddTaskView.swift in Sources */,
 				C2513FF82D4060B2007B4C52 /* CalendarService.swift in Sources */,
 				C2BDBA5A2D3C527D005E8E68 /* TaskRowCompact.swift in Sources */,
-				C2BA21BD2D42C209004320E4 /* BacklogListView.swift in Sources */,
 				C23730DB2D2C88AE00EBA542 /* Persistence.swift in Sources */,
 				C28D53932D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift in Sources */,
 				C28D53942D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift in Sources */,
