@@ -216,7 +216,9 @@ if tasksForSelectedDate.isEmpty {
             // 2) Drag & Drop (flicker-free preview)
             .onDrag(
                 {
-                    HapticManager.shared.playHaptic(.impactMedium)
+                    
+                    // HapticManager.shared.playHaptic(.impactMedium)
+                    
 
                     let taskID = task.objectID.uriRepresentation().absoluteString
                     return NSItemProvider(object: taskID as NSString)

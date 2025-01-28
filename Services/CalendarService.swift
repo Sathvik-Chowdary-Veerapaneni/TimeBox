@@ -128,7 +128,7 @@ class CalendarService {
             task.eventIdentifier = nil
             try context.save()
             return true
-        } catch {
+         } catch {
             print("Error deleting event: \(error)")
             return false
         }
