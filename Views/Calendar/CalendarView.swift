@@ -247,7 +247,6 @@ if tasksForSelectedDate.isEmpty {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack {
-                        // Overdue toggle
                         Button {
                             showBacklog.toggle()
                             if showBacklog {
@@ -257,13 +256,27 @@ if tasksForSelectedDate.isEmpty {
                             if showBacklog {
                                 Image(systemName: "calendar")
                             } else {
-                                HStack {
+                                ZStack(alignment: .topTrailing) {
+                                    // The base icon
                                     Image(systemName: "exclamationmark.triangle.fill")
-                                    Text("OverDue")
+                                        .font(.title2)
+                                        .foregroundColor(.orange)
+                                    
+                                    // The badge, only if backlogTasks > 0
+                                    if backlogTasks.count > 0 {
+                                        Text("\(backlogTasks.count)")
+                                            .font(.system(size: 10, weight: .bold))
+                                            .foregroundColor(.white)
+                                            .padding(4)
+                                            .background(Color.red)
+                                            .clipShape(Circle())
+                                            .offset(x: 8, y: -3)
+                                    }
                                 }
                             }
                         }
-                        
+
+                        // --- BELOW is your existing search button code ---
                         // Search toggle
                         Button {
                             withAnimation {
