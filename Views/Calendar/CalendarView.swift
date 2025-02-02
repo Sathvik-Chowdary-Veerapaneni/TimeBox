@@ -293,12 +293,12 @@ if tasksForSelectedDate.isEmpty {
                     }
                 }
             }
-            // After the main VStack, or inside .toolbar, add:
-        .sheet(item: $selectedTask) { task in
-        TaskDescriptionPopup(task: task)
-        .environment(\.managedObjectContext, viewContext)
-}
-            // If user tries to move a Done task
+            .sheet(item: $selectedTask) { task in
+                TaskDescriptionPopup(task: task)
+                    .environment(\.managedObjectContext, viewContext)
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
+            }
             .alert("Cannot Move Done Task",
                    isPresented: $showDoneAlert,
                    actions: {
