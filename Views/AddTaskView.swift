@@ -5,7 +5,7 @@ struct AddTaskView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var taskVM: TaskViewModel
-    
+
     @State private var title = ""
     @State private var desc = ""
     @State private var showEmptyTitleAlert = false
@@ -14,6 +14,9 @@ struct AddTaskView: View {
     @State private var selectedDay = Date()
     
     private let defaultStatus = ""
+    
+    // <<< ADDED: track the old desc to detect newlines
+    @State private var oldDesc = ""
     
     var body: some View {
         NavigationView {
@@ -24,6 +27,14 @@ struct AddTaskView: View {
                     
                     TextEditor(text: $desc)
                         .frame(height: 80)
+                        // <<< ADDED: Detect newline at the end
+                        .onChange(of: desc) { newValue in
+                            if newValue.count > oldDesc.count,      // typed something new
+                               newValue.hasSuffix("\n") {           // ends with newline
+                                desc += "- "                        // append dash+space
+                            }
+                            oldDesc = desc
+                        }
                         .overlay(
                             RoundedRectangle(cornerRadius: 8)
                                 .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
@@ -35,7 +46,7 @@ struct AddTaskView: View {
                     DatePicker(
                         "Select Day",
                         selection: $selectedDay,
-                        in: Date()...,      // or remove if past is allowed
+                        in: Date()...,    // remove if you allow past
                         displayedComponents: [.date]
                     )
                 }
