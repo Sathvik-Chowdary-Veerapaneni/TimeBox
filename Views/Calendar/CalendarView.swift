@@ -243,6 +243,7 @@ if tasksForSelectedDate.isEmpty {
                 
                 selectedDate = Date()
                 tasksForSelectedDate = fetchTasks(for: selectedDate)
+                backlogTasks = fetchBacklogTasks()
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
