@@ -26,7 +26,14 @@ struct ContentView: View {
     @State private var showProfileSheet = false
     
     var body: some View {
-        NavigationView {
+        let sortedTodayTasks = Array(todayTasks).sorted { a, b in
+            let isDoneA = (a.status == "Done")
+            let isDoneB = (b.status == "Done")
+            if isDoneA != isDoneB { return !isDoneA }
+            if a.priorityRank != b.priorityRank { return a.priorityRank < b.priorityRank }
+            return a.sortIndex < b.sortIndex
+        }
+        return NavigationView {
             VStack(spacing: 0) {
                 // TOP BAR
                 HStack {
@@ -60,7 +67,7 @@ struct ContentView: View {
                 
                 // Show "today" tasks from the @FetchRequest:
                 List {
-                    ForEach(todayTasks, id: \.objectID) { task in
+                    ForEach(sortedTodayTasks, id: \.objectID) { task in
                         TaskRowCompact(
                             task: task,
                             allTasks: Array(todayTasks),  // pass an Array if needed

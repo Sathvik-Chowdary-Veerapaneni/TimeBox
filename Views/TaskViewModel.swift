@@ -15,6 +15,7 @@ class TaskViewModel: ObservableObject {
     // MARK: - Fetch Methods
     
     // (A) Generic fetch
+    // In TaskViewModel.swift
     func fetchTasks() {
         let request = NSFetchRequest<TimeBox_Task>(entityName: "TimeBox_Task")
         request.sortDescriptors = [
@@ -23,6 +24,22 @@ class TaskViewModel: ObservableObject {
         ]
         do {
             tasks = try context.fetch(request)
+            
+            // NEW: move "Done" tasks to the bottom
+            tasks.sort {
+                let isDoneA = ($0.status == "Done")
+                let isDoneB = ($1.status == "Done")
+                
+                // If one is Done and the other is not, Done goes last
+                if isDoneA != isDoneB {
+                    return !isDoneA
+                }
+                // Otherwise, keep priorityRank & sortIndex ordering
+                if $0.priorityRank != $1.priorityRank {
+                    return $0.priorityRank < $1.priorityRank
+                }
+                return $0.sortIndex < $1.sortIndex
+            }
         } catch {
             print("Error fetching tasks: \(error.localizedDescription)")
             tasks = []
@@ -48,6 +65,20 @@ class TaskViewModel: ObservableObject {
         
         do {
             tasks = try context.fetch(request)
+            tasks.sort {
+                        let isDoneA = ($0.status == "Done")
+                        let isDoneB = ($1.status == "Done")
+                        
+                        // If one is Done and the other isn’t, Done goes last
+                        if isDoneA != isDoneB {
+                            return !isDoneA
+                        }
+                        // Otherwise compare priorityRank, then sortIndex
+                        if $0.priorityRank != $1.priorityRank {
+                            return $0.priorityRank < $1.priorityRank
+                        }
+                        return $0.sortIndex < $1.sortIndex
+                    }
         } catch {
             print("Error fetching today’s tasks: \(error.localizedDescription)")
             tasks = []
