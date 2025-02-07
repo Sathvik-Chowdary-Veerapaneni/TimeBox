@@ -140,7 +140,7 @@ struct CalendarView: View {
                         List {
                             ForEach(searchResults, id: \.objectID) { task in
                                 HStack {
-                                    Text(task.title ?? "Untitled")
+                                    highlightMatches(in: task.title ?? "Untitled", searchText: searchText)
                                         .font(.headline)
                                     Spacer()
                                     if let st = task.startTime {

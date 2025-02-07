@@ -228,4 +228,24 @@ extension CalendarView {
         formatter.dateStyle = .medium
         return formatter.string(from: date)
     }
+
+    func highlightMatches(in fullText: String, searchText: String) -> Text {
+        guard !fullText.isEmpty, !searchText.isEmpty else {
+            return Text(fullText)
+        }
+        let lowerFull = fullText.lowercased()
+        let lowerSearch = searchText.lowercased()
+
+        guard let range = lowerFull.range(of: lowerSearch) else {
+            return Text(fullText)
+        }
+        
+        let prefix = String(fullText[..<range.lowerBound])
+        let match  = String(fullText[range])
+        let suffix = String(fullText[range.upperBound...])
+        
+        return Text(prefix)
+            + Text(match).foregroundColor(.yellow)  // highlight color
+            + highlightMatches(in: suffix, searchText: searchText)
+    }
 }
