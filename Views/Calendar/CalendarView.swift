@@ -109,6 +109,20 @@ struct CalendarView: View {
                         }
                         .padding(.horizontal)
                     }
+                    .gesture(
+                        DragGesture().onEnded { value in
+                            let horizontalAmount = value.translation.width
+                            if horizontalAmount < -50 {
+                                // Swipe left -> next month
+                                currentMonth = Calendar.current.date(byAdding: .month, value: 1, to: currentMonth) ?? currentMonth
+                                fetchMonthlyTaskCounts(for: currentMonth)
+                            } else if horizontalAmount > 50 {
+                                // Swipe right -> previous month
+                                currentMonth = Calendar.current.date(byAdding: .month, value: -1, to: currentMonth) ?? currentMonth
+                                fetchMonthlyTaskCounts(for: currentMonth)
+                            }
+                        }
+                    )
                     .frame(height: 220) // fix height to avoid layout compression
                 }
                 
