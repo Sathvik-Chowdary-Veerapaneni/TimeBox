@@ -252,7 +252,7 @@ if tasksForSelectedDate.isEmpty {
                     }
                 }
             }
-            .navigationTitle(showBacklog ? "OverDue" : "Calendar")
+            .navigationTitle("")
             .onAppear {
                 // Initial load
                 currentMonth = Date()
@@ -263,50 +263,48 @@ if tasksForSelectedDate.isEmpty {
                 backlogTasks = fetchBacklogTasks()
             }
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    HStack {
-                        Button {
-                            showBacklog.toggle()
-                            if showBacklog {
-                                backlogTasks = fetchBacklogTasks()
-                            }
-                        } label: {
-                            if showBacklog {
-                                Image(systemName: "calendar")
-                            } else {
-                                ZStack(alignment: .topTrailing) {
-                                    // The base icon
-                                    Image(systemName: "exclamationmark.triangle.fill")
-                                        .font(.title2)
-                                        .foregroundColor(.orange)
-                                    
-                                    // The badge, only if backlogTasks > 0
-                                    if backlogTasks.count > 0 {
-                                        Text("\(backlogTasks.count)")
-                                            .font(.system(size: 10, weight: .bold))
-                                            .foregroundColor(.white)
-                                            .padding(4)
-                                            .background(Color.red)
-                                            .clipShape(Circle())
-                                            .offset(x: 8, y: -3)
-                                    }
-                                }
-                            }
+                // OverDue on the left
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        showBacklog.toggle()
+                        if showBacklog {
+                            backlogTasks = fetchBacklogTasks()
                         }
+                    } label: {
+                        if showBacklog {
+                            Image(systemName: "calendar")
+                        } else {
+                            ZStack(alignment: .topTrailing) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .font(.title2)
+                                    .foregroundColor(.orange)
 
-                        // --- BELOW is your existing search button code ---
-                        // Search toggle
-                        Button {
-                            withAnimation {
-                                showSearch.toggle()
-                                if !showSearch {
-                                    searchText = ""
-                                    searchResults = []
+                                if backlogTasks.count > 0 {
+                                    Text("\(backlogTasks.count)")
+                                        .font(.system(size: 10, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .padding(4)
+                                        .background(Color.red)
+                                        .clipShape(Circle())
+                                        .offset(x: 8, y: -3)
                                 }
                             }
-                        } label: {
-                            Image(systemName: "magnifyingglass")
                         }
+                    }
+                }
+
+                // Search on the right
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        withAnimation {
+                            showSearch.toggle()
+                            if !showSearch {
+                                searchText = ""
+                                searchResults = []
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "magnifyingglass")
                     }
                 }
             }
