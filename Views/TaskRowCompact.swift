@@ -30,7 +30,8 @@ struct TaskRowCompact: View {
     @State private var showPostponeSheet = false
     @State private var postponeDate = Date()
     @State private var postponeReason = ""
-    
+    @State private var showLimitAlert = false
+    @State private var pendingInProgressTask: TimeBox_Task? = nil
     var body: some View {
         HStack(spacing: 12) {
             Text(task.title ?? "Untitled")
@@ -92,10 +93,21 @@ struct TaskRowCompact: View {
             // STATUS MENU
             Menu {
                 Button {
-                    taskVM.setTaskStatus(task, to: "InProgress")
+                    // Count how many tasks are “InProgress”
+                    let inProgCount = allTasks.filter { $0.status == "InProgress" }.count
+                    // If you prefer to use `taskVM.tasks`, make sure it’s up-to-date or that you use the same data the user sees in this view.
+                    
+                    if inProgCount >= 2 {
+                        // Instead of showing the alert here, set a @State flag
+                        pendingInProgressTask = task
+                        showLimitAlert = true
+                    } else {
+                        taskVM.setTaskStatus(task, to: "InProgress")
+                    }
                 } label: {
                     Label("In Progress", systemImage: "clock.fill")
                 }
+                
                 Button {
                     taskVM.setTaskStatus(task, to: "Done")
                 } label: {
@@ -132,6 +144,20 @@ struct TaskRowCompact: View {
                 .fill(Color(.systemBackground))
                 .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
         )
+        
+        .alert("You Already Have Two Tasks in Progress",
+               isPresented: $showLimitAlert) {
+            Button("Proceed") {
+                // Actually set the status if user confirms
+                if let t = pendingInProgressTask {
+                    taskVM.setTaskStatus(t, to: "InProgress")
+                }
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("Not recommended more than 2 tasks")
+        }
+        
         .onTapGesture {
             tapped(task)
         }
