@@ -22,7 +22,9 @@ extension CalendarView {
     /// Fetch tasks for a single day
     func fetchTasks(for day: Date) -> [TimeBox_Task] {
         let startOfDay = Calendar.current.startOfDay(for: day)
-        guard let endOfDay = Calendar.current.date(byAdding: .day, value: 1, to: startOfDay) else { return [] }
+        guard let endOfDay = Calendar.current.date(byAdding: .day, value: 1, to: startOfDay) else {
+            return []
+        }
         
         let request = NSFetchRequest<TimeBox_Task>(entityName: "TimeBox_Task")
         request.predicate = NSPredicate(
@@ -39,6 +41,7 @@ extension CalendarView {
     }
     
     /// Fetch tasks for the entire month, and build `dailyTaskCounts`
+    // Modify fetchMonthlyTaskCounts to also fill dailyDoneCounts:
     func fetchMonthlyTaskCounts(for month: Date) {
         guard let interval = Calendar.current.dateInterval(of: .month, for: month) else { return }
         
@@ -50,17 +53,26 @@ extension CalendarView {
         )
         do {
             let tasks = try viewContext.fetch(request)
+            
             var counts: [Date: Int] = [:]
+            var doneCounts: [Date: Int] = [:]  // <-- NEW
             for t in tasks {
-                if let st = t.startTime {
-                    let dayOnly = Calendar.current.startOfDay(for: st)
+                if let start = t.startTime {
+                    let dayOnly = Calendar.current.startOfDay(for: start)
                     counts[dayOnly, default: 0] += 1
+                    
+                    // Count done tasks
+                    if t.status == "Done" {
+                        doneCounts[dayOnly, default: 0] += 1
+                    }
                 }
             }
+            
             dailyTaskCounts = counts
+            dailyDoneCounts = doneCounts  // <-- NEW
         } catch {
-            print("Error fetching monthly tasks: \(error)")
             dailyTaskCounts = [:]
+            dailyDoneCounts = [:]         // <-- NEW
         }
     }
     
@@ -80,8 +92,8 @@ extension CalendarView {
             return []
         }
     }
-
-    // “Perform search” (≥3 chars)
+    
+    /// Perform search (only if text is ≥3 characters)
     func performSearch(_ text: String) {
         guard text.count >= 3 else {
             searchResults = []
@@ -114,22 +126,24 @@ extension CalendarView {
         }
     }
     
-    // “Handle drop task” (drag & drop logic)
+    /// Handle drag-and-drop of a task onto a day in the calendar
     func handleDropTask(_ objectIDString: String, day: Date) -> Bool {
         guard
             let url = URL(string: objectIDString),
             let objID = viewContext.persistentStoreCoordinator?
                 .managedObjectID(forURIRepresentation: url),
             let droppedTask = try? viewContext.existingObject(with: objID) as? TimeBox_Task
-        else { return false }
+        else {
+            return false
+        }
         
-        // Block if "Done"
+        // Prevent dropping if task is "Done"
         if droppedTask.status == "Done" {
             showDoneAlert = true
             return false
         }
         
-        // Disallow dropping on past
+        // Disallow dropping on the past
         let startOfToday = Calendar.current.startOfDay(for: Date())
         let thisDay = Calendar.current.startOfDay(for: day)
         guard thisDay >= startOfToday else {
@@ -138,20 +152,20 @@ extension CalendarView {
         }
         
         let oldDate = droppedTask.startTime
-        // If old date was "today," remove from ContentView’s “today tasks”
+        // If old date was "today," remove from today's tasks in ContentView
         if let oldDate = oldDate, Calendar.current.isDate(oldDate, inSameDayAs: Date()) {
             taskVM.fetchTodayTasks()
         }
         
-        // Actually reschedule
+        // Reschedule the task
         taskVM.rescheduleTask(with: objectIDString, to: day)
         
-        // If new date is "today," add to ContentView’s “today tasks”
+        // If new date is "today," add to today's tasks in ContentView
         if Calendar.current.isDate(day, inSameDayAs: Date()) {
             taskVM.fetchTodayTasks()
         }
         
-        // UI updates in selected day tasks
+        // Update the tasksForSelectedDate if user is currently viewing old or new date
         if let oldDate = oldDate,
            Calendar.current.isDate(oldDate, inSameDayAs: selectedDate) {
             tasksForSelectedDate.removeAll { $0.objectID == droppedTask.objectID }
@@ -178,7 +192,7 @@ extension CalendarView {
         return true
     }
     
-    // “Backlog tasks” or “day tasks” deletion
+    /// Delete tasks from the backlog
     func deleteBacklogTasks(at offsets: IndexSet) {
         for idx in offsets {
             let task = backlogTasks[idx]
@@ -187,7 +201,7 @@ extension CalendarView {
         }
     }
     
-    // Delete Tasks
+    /// Delete tasks from the selected day’s list
     func deleteTasks(at offsets: IndexSet) {
         for idx in offsets {
             let task = tasksForSelectedDate[idx]
@@ -201,19 +215,17 @@ extension CalendarView {
         }
     }
     
-    // Format a month, e.g. "January 2025"
+    /// Format a month, e.g. "January 2025"
     func formatMonth(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "LLLL yyyy"
         return formatter.string(from: date)
     }
     
-    // Format a date for display
+    /// Format a date for display (medium style)
     func dateString(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         return formatter.string(from: date)
     }
 }
-
-

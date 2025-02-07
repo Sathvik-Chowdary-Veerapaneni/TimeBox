@@ -27,6 +27,7 @@ struct CalendarView: View {
     @State  var tasksForSelectedDate: [TimeBox_Task] = []
     @State  var backlogTasks: [TimeBox_Task] = []
     @State var dailyTaskCounts: [Date: Int] = [:]
+    @State var dailyDoneCounts: [Date: Int] = [:]
     
     // Alert for done-task drag
     @State  var showDoneAlert = false
@@ -87,11 +88,13 @@ struct CalendarView: View {
                             ForEach(daysInMonth, id: \.self) { day in
                                 let dayOnly = Calendar.current.startOfDay(for: day)
                                 let count = dailyTaskCounts[dayOnly] ?? 0
+                                let doneCount = dailyDoneCounts[dayOnly] ?? 0
                                 
                                 DayCellView(
                                     day: day,
                                     selectedDate: selectedDate,
                                     dayTaskCount: count,
+                                    dayDoneCount: doneCount,
                                     onTap: {
                                         if !showBacklog {
                                             selectedDate = day

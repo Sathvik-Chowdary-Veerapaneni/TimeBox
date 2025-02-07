@@ -6,6 +6,7 @@ struct DayCellView: View {
     let day: Date
     let selectedDate: Date
     let dayTaskCount: Int
+    let dayDoneCount: Int
     
     let onTap: () -> Void
     let onDropTask: (String) -> Bool
@@ -36,29 +37,29 @@ struct DayCellView: View {
                     RoundedRectangle(cornerRadius: 14)
                         .stroke(Color.gray.opacity(0.4), lineWidth: 0.5)
                 )
-                // Tapping a day
-                .onTapGesture { onTap() }
-                // DRAG & DROP
-                .onDrop(of: [UTType.plainText], isTargeted: $isTargeted) { providers in
-                    if isPast { return false } // disallow dropping on the past
-                    guard let provider = providers.first else { return false }
-                    provider.loadObject(ofClass: String.self) { objectIDString, error in
-                        if let error = error { print("DayCellView: loadObject error ->", error); return }
-                        guard let objectIDString = objectIDString else { return }
-                        DispatchQueue.main.async {
-                            let result = onDropTask(objectIDString)
-                            print("DayCellView: onDropTask ->", result)
-                        }
-                    }
-                    return true
-                }
-            
+            // CHANGED: onTapGesture
+                   .onTapGesture { onTap() }
+                   // CHANGED: onDrop
+                   .onDrop(of: [UTType.plainText], isTargeted: $isTargeted) { providers in
+                       if isPast { return false }
+                       guard let provider = providers.first else { return false }
+                       provider.loadObject(ofClass: String.self) { objectIDString, error in
+                           if let error = error { print("DayCellView error:", error); return }
+                           guard let objectIDString = objectIDString else { return }
+                           DispatchQueue.main.async {
+                               _ = onDropTask(objectIDString)
+                           }
+                       }
+                       return true
+                   }
+
             if dayTaskCount > 0 {
+                let badgeColor: Color = (dayDoneCount == dayTaskCount) ? .green : .red
                 Text("\(dayTaskCount)")
                     .font(.system(size: 12, weight: .bold))
                     .foregroundColor(.white)
                     .padding(5)
-                    .background(Color.red)
+                    .background(badgeColor)
                     .clipShape(Circle())
                     .offset(x: 9.5, y: -10)
             }
