@@ -32,6 +32,11 @@ struct TaskRowCompact: View {
     @State private var postponeReason = ""
     @State private var showLimitAlert = false
     @State private var pendingInProgressTask: TimeBox_Task? = nil
+    @State private var pendingDoneTask: TimeBox_Task? = nil
+    @State private var showResolutionPopup = false
+    @State private var showResolutionAlert = false
+
+
     var body: some View {
         HStack(spacing: 12) {
             Text(task.title ?? "Untitled")
@@ -93,12 +98,8 @@ struct TaskRowCompact: View {
             // STATUS MENU
             Menu {
                 Button {
-                    // Count how many tasks are “InProgress”
                     let inProgCount = allTasks.filter { $0.status == "InProgress" }.count
-                    // If you prefer to use `taskVM.tasks`, make sure it’s up-to-date or that you use the same data the user sees in this view.
-                    
                     if inProgCount >= 2 {
-                        // Instead of showing the alert here, set a @State flag
                         pendingInProgressTask = task
                         showLimitAlert = true
                     } else {
@@ -109,10 +110,17 @@ struct TaskRowCompact: View {
                 }
                 
                 Button {
-                    taskVM.setTaskStatus(task, to: "Done")
+                    let resolutionText = (task.resolution ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+                    if resolutionText.isEmpty {
+                        pendingDoneTask = task
+                        showResolutionAlert = true
+                    } else {
+                        taskVM.setTaskStatus(task, to: "Done")
+                    }
                 } label: {
                     Label("Done", systemImage: "checkmark.seal.fill")
                 }
+                
                 // "Postpone" -> open a sheet
                 Button {
                     postponeDate = task.startTime ?? Date()
@@ -158,9 +166,48 @@ struct TaskRowCompact: View {
             Text("Not recommended more than 2 tasks")
         }
         
+        .alert("Resolution Required", isPresented: $showResolutionAlert) {
+            Button("OK") {
+                showResolutionPopup = true
+            }
+        } message: {
+            Text("Please provide a resolution before marking the task as done.")
+        }
+
+        // Existing .sheet for resolution
+        .sheet(isPresented: $showResolutionPopup) {
+            if let t = pendingDoneTask {
+                TaskDescriptionPopup(task: t)
+                    .environment(\.managedObjectContext, viewContext)
+                    .onDisappear {
+                        // Once the popup closes, see if they filled a resolution
+                        let newRes = (t.resolution ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+                        if !newRes.isEmpty {
+                            // Now that a resolution is there, set it to "Done"
+                            taskVM.setTaskStatus(t, to: "Done")
+                        }
+                        pendingDoneTask = nil
+                    }
+            }
+        }
+        
         .onTapGesture {
             tapped(task)
         }
+//        .sheet(isPresented: $showResolutionPopup) {
+//            if let t = pendingDoneTask {
+//                TaskDescriptionPopup(task: t)
+//                    .environment(\.managedObjectContext, viewContext)
+//                    .onDisappear {
+//                        let newRes = (t.resolution ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+//                        if !newRes.isEmpty {
+//                            taskVM.setTaskStatus(t, to: "Done")
+//                        }
+//                        pendingDoneTask = nil
+//                    }
+//            }
+//        }
+        
         // POSTPONE SHEET
         .sheet(isPresented: $showPostponeSheet) {
             NavigationView {
