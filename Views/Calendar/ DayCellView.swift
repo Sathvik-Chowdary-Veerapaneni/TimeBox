@@ -38,7 +38,10 @@ struct DayCellView: View {
                         .stroke(Color.gray.opacity(0.4), lineWidth: 0.5)
                 )
             // CHANGED: onTapGesture
-                   .onTapGesture { onTap() }
+                   .onTapGesture {
+                       HapticManager.lightImpact()
+                       onTap()
+                   }
                    // CHANGED: onDrop
                    .onDrop(of: [UTType.plainText], isTargeted: $isTargeted) { providers in
                        if isPast { return false }
