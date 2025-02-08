@@ -108,6 +108,7 @@ struct CalendarView: View {
                             }
                         }
                         .padding(.horizontal)
+                        .padding(.top, 10)
                     }
                     .gesture(
                         DragGesture().onEnded { value in
