@@ -25,6 +25,7 @@ extension TimeBox_Task {
     // NEW postpone fields
     @NSManaged public var postponeDate: Date?       // The date/time to which the user postponed
     @NSManaged public var postponeReason: String?   // Reason for postponement
+    @NSManaged public var inProgressStartTime: Date?
 }
 
 extension TimeBox_Task: Identifiable {}

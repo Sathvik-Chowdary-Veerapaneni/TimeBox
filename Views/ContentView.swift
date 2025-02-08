@@ -93,6 +93,7 @@ struct ContentView: View {
                 .padding(.vertical, 16)
             }
             .navigationBarHidden(true)
+            
         }
         // SHEETS
         .sheet(isPresented: $showCalendar) {
@@ -117,6 +118,14 @@ struct ContentView: View {
                 .environment(\.managedObjectContext, viewContext)
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
+        }
+        .alert("Congratulations!", isPresented: $taskVM.showCongratsBanner) {
+            Button("OK") {
+                // Reset if desired
+                taskVM.showCongratsBanner = false
+            }
+        } message: {
+            Text(taskVM.congratsMessage)
         }
         
         .toolbar {

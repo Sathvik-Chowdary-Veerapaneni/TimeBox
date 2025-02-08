@@ -3,6 +3,8 @@ import CoreData
 
 class TaskViewModel: ObservableObject {
     @Published var tasks: [TimeBox_Task] = []
+    @Published var showCongratsBanner = false
+    @Published var congratsMessage = ""
     
     // Keep context private to enforce clean architecture
     private let context: NSManagedObjectContext
@@ -98,8 +100,22 @@ class TaskViewModel: ObservableObject {
     // MARK: - Task Updates
     
     func setTaskStatus(_ task: TimeBox_Task, to newStatus: String) {
+        let oldStatus = task.status ?? ""
         withAnimation {
             task.status = newStatus
+            if oldStatus != "InProgress" && newStatus == "InProgress" {
+                task.inProgressStartTime = Date()
+            }
+            else if oldStatus == "InProgress" && newStatus == "Done" {
+                if let startTime = task.inProgressStartTime {
+                    let elapsed = Date().timeIntervalSince(startTime) / 3600.0
+                    if elapsed >= task.timeAllocated {
+                        showCongratsBanner = true
+                        congratsMessage = "Great job completing '\(task.title ?? "Untitled")'!"
+                    }
+                }
+            }
+            
             saveChanges()
             fetchTodayTasks()
         }
