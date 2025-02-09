@@ -5,7 +5,7 @@ struct AddTaskView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var taskVM: TaskViewModel
-    
+
     @State private var title = ""
     @State private var desc = ""
     @State private var showEmptyTitleAlert = false
@@ -14,6 +14,9 @@ struct AddTaskView: View {
     @State private var selectedDay = Date()
     
     private let defaultStatus = ""
+    
+    // <<< ADDED: track the old desc to detect newlines
+    @State private var oldDesc = ""
     
     var body: some View {
         NavigationView {
@@ -24,6 +27,14 @@ struct AddTaskView: View {
                     
                     TextEditor(text: $desc)
                         .frame(height: 80)
+                        // <<< ADDED: Detect newline at the end
+                        .onChange(of: desc) { newValue in
+                            if newValue.count > oldDesc.count,      // typed something new
+                               newValue.hasSuffix("\n") {           // ends with newline
+                                desc += "- "                        // append dash+space
+                            }
+                            oldDesc = desc
+                        }
                         .overlay(
                             RoundedRectangle(cornerRadius: 8)
                                 .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
@@ -35,7 +46,7 @@ struct AddTaskView: View {
                     DatePicker(
                         "Select Day",
                         selection: $selectedDay,
-                        in: Date()...,      // or remove if past is allowed
+                        in: Date()...,    // remove if you allow past
                         displayedComponents: [.date]
                     )
                 }
@@ -67,41 +78,28 @@ struct AddTaskView: View {
             showEmptyTitleAlert = true
             return
         }
-        
-        // Convert user-chosen date to local midnight
         var calendar = Calendar.current
         calendar.timeZone = .current
         let midnightDate = calendar.startOfDay(for: selectedDay)
-        
-        // 1) Create the new task
         let newTask = TimeBox_Task(context: viewContext)
         newTask.title = title
         newTask.desc  = desc
         newTask.status = defaultStatus
-        
-        // Store only local midnight in startTime
         newTask.startTime = midnightDate
-        
-        // 2) If it’s unassigned by default, set priorityRank = 3
         newTask.priorityRank   = 3
         newTask.prioritySymbol = ""
         
         do {
-            // 3) Fetch all tasks where priorityRank == 3
             let fetch = NSFetchRequest<TimeBox_Task>(entityName: "TimeBox_Task")
             fetch.predicate = NSPredicate(format: "priorityRank == 3")
-            
             let unpinnedTasks = try viewContext.fetch(fetch)
-            // 4) The highest sortIndex among unpinned tasks
             let maxIndex = unpinnedTasks.map { $0.sortIndex }.max() ?? 0
-            
-            // 5) Place new task at the end
             newTask.sortIndex = maxIndex + 1
-            
-            // 6) Save and refresh
             try viewContext.save()
             CalendarService.shared.addEvent(for: newTask, in: viewContext)
             taskVM.fetchTasks()
+            
+            HapticManager.successNotification()
             
             dismiss()
         } catch {

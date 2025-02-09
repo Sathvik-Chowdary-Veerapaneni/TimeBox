@@ -12,6 +12,7 @@
 		C2513FF22D40510A007B4C52 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2513FF12D40510A007B4C52 /* ProfileView.swift */; };
 		C2513FF82D4060B2007B4C52 /* CalendarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2513FF72D4060B2007B4C52 /* CalendarService.swift */; };
 		C2513FFC2D406D73007B4C52 /* TaskViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2513FFB2D406D73007B4C52 /* TaskViewModel.swift */; };
+		C28AC6D12D484BAE00272874 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C28AC6D02D484BAE00272874 /* HapticManager.swift */; };
 		C28D53932D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = C28D53922D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift */; };
 		C28D53942D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = C28D53912D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift */; };
 		C2BA21C42D42D231004320E4 /* Predicates.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BA21C32D42D231004320E4 /* Predicates.swift */; };
@@ -46,6 +47,7 @@
 		C2513FF12D40510A007B4C52 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		C2513FF72D4060B2007B4C52 /* CalendarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarService.swift; sourceTree = "<group>"; };
 		C2513FFB2D406D73007B4C52 /* TaskViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskViewModel.swift; sourceTree = "<group>"; };
+		C28AC6D02D484BAE00272874 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
 		C28D53912D2CD7F1007605F3 /* TimeBox_Task+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeBox_Task+CoreDataClass.swift"; sourceTree = "<group>"; };
 		C28D53922D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeBox_Task+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		C2BA21C32D42D231004320E4 /* Predicates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Predicates.swift; sourceTree = "<group>"; };
@@ -159,6 +161,7 @@
 		C23730E72D2C89E000EBA542 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				C28AC6D02D484BAE00272874 /* HapticManager.swift */,
 				C23730D42D2C88AE00EBA542 /* Persistence.swift */,
 				C2513FF72D4060B2007B4C52 /* CalendarService.swift */,
 			);
@@ -325,6 +328,7 @@
 				C2BDBA5C2D3C529E005E8E68 /* AddTaskView.swift in Sources */,
 				C2513FF82D4060B2007B4C52 /* CalendarService.swift in Sources */,
 				C2BDBA5A2D3C527D005E8E68 /* TaskRowCompact.swift in Sources */,
+				C28AC6D12D484BAE00272874 /* HapticManager.swift in Sources */,
 				C2BA21C42D42D231004320E4 /* Predicates.swift in Sources */,
 				C23730DB2D2C88AE00EBA542 /* Persistence.swift in Sources */,
 				C28D53932D2CD7F1007605F3 /* TimeBox_Task+CoreDataProperties.swift in Sources */,
