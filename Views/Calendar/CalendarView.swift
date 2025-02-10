@@ -150,7 +150,11 @@ struct CalendarView: View {
                                             .font(.caption)
                                     }
                                 }
-                                // Optionally .onDrag here
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    HapticManager.lightImpact()
+                                    selectedTask = task
+                                }
                             }
                         }
                         .frame(maxHeight: .infinity)
