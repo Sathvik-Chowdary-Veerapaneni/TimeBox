@@ -55,9 +55,7 @@ class TaskViewModel: ObservableObject {
         let startOfToday = Calendar.current.startOfDay(for: Date())
         guard let endOfToday = Calendar.current.date(byAdding: .day, value: 1, to: startOfToday) else { return }
         
-        // Exclude postponed tasks & require startTime in [today..tomorrow)
         request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            NSPredicate(format: "status != %@", "Postpone"),
             NSPredicate(format: "startTime >= %@ AND startTime < %@", startOfToday as CVarArg, endOfToday as CVarArg)
         ])
         request.sortDescriptors = [

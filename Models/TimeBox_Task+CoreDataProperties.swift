@@ -21,10 +21,6 @@ extension TimeBox_Task {
     @NSManaged public var eventIdentifier: String?  // Apple Calendar event ID
     @NSManaged public var startTime: Date?          // Task start time
     @NSManaged public var endTime: Date?            // Task end time
-    
-    // NEW postpone fields
-    @NSManaged public var postponeDate: Date?       // The date/time to which the user postponed
-    @NSManaged public var postponeReason: String?   // Reason for postponement
     @NSManaged public var inProgressStartTime: Date?
 }
 

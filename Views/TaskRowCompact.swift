@@ -17,19 +17,14 @@ struct TaskRowCompact: View {
         (2.0,  "2h",  "2.circle.fill"),
         (3.0,  "3h",  "3.circle.fill")
     ]
-    private let orderedStatuses = ["InProgress", "Done", "Postpone"]
+    private let orderedStatuses = ["InProgress", "Done"]
     private let statusInfo: [String: (iconName: String, color: Color, label: String)] = [
         "InProgress": ("clock.fill",     .blue,   "In Progress"),
         "Done":       ("checkmark.seal.fill", .green,  "Done"),
-        "Postpone":   ("hourglass",      .orange, "Postpone")
     ]
     
     private let symbolsInOrder = ["!", "!!", "!!!"]
     
-    // State for Postpone popup
-    @State private var showPostponeSheet = false
-    @State private var postponeDate = Date()
-    @State private var postponeReason = ""
     @State private var showLimitAlert = false
     @State private var pendingInProgressTask: TimeBox_Task? = nil
     @State private var pendingDoneTask: TimeBox_Task? = nil
@@ -121,14 +116,6 @@ struct TaskRowCompact: View {
                     Label("Done", systemImage: "checkmark.seal.fill")
                 }
                 
-                // "Postpone" -> open a sheet
-                Button {
-                    postponeDate = task.startTime ?? Date()
-                    postponeReason = ""
-                    showPostponeSheet = true
-                } label: {
-                    Label("Postpone", systemImage: "hourglass")
-                }
                 Button("Clear Status") {
                     taskVM.setTaskStatus(task, to: "")
                 }
@@ -173,7 +160,7 @@ struct TaskRowCompact: View {
         } message: {
             Text("Please provide a resolution before marking the task as done.")
         }
-
+        
         // Existing .sheet for resolution
         .sheet(isPresented: $showResolutionPopup) {
             if let t = pendingDoneTask {
@@ -194,65 +181,6 @@ struct TaskRowCompact: View {
         .onTapGesture {
             HapticManager.lightImpact()
             tapped(task)
-        }
-//        .sheet(isPresented: $showResolutionPopup) {
-//            if let t = pendingDoneTask {
-//                TaskDescriptionPopup(task: t)
-//                    .environment(\.managedObjectContext, viewContext)
-//                    .onDisappear {
-//                        let newRes = (t.resolution ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-//                        if !newRes.isEmpty {
-//                            taskVM.setTaskStatus(t, to: "Done")
-//                        }
-//                        pendingDoneTask = nil
-//                    }
-//            }
-//        }
-        
-        // POSTPONE SHEET
-        .sheet(isPresented: $showPostponeSheet) {
-            NavigationView {
-                Form {
-                    Section(header: Text("Postpone To")) {
-                        DatePicker("Select date/time", selection: $postponeDate, displayedComponents: [.date, .hourAndMinute])
-                            .datePickerStyle(.wheel)
-                    }
-                    Section(header: Text("Reason")) {
-                        TextField("Enter reason...", text: $postponeReason)
-                    }
-                }
-                .navigationTitle("Postpone Task")
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") {
-                            showPostponeSheet = false
-                        }
-                    }
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button("Save") {
-                            // If user picks a time still “today,” force tomorrow
-                            let startOfToday = Calendar.current.startOfDay(for: Date())
-                            let endOfToday   = Calendar.current.date(byAdding: .day, value: 1, to: startOfToday)!
-                            if postponeDate < endOfToday {
-                                // Force tomorrow at same hour/min
-                                postponeDate = Calendar.current.date(byAdding: .day, value: 1, to: postponeDate)!
-                            }
-                            
-                            // Mark as "Postpone"
-                            task.status = "Postpone"
-                            task.startTime = postponeDate
-                            
-                            task.postponeDate   = postponeDate
-                            task.postponeReason = postponeReason
-                            
-                            saveChanges()
-                            taskVM.fetchTodayTasks()
-                            
-                            showPostponeSheet = false
-                        }
-                    }
-                }
-            }
         }
     }
 }

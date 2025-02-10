@@ -213,9 +213,6 @@ if tasksForSelectedDate.isEmpty {
                     case "InProgress":
                         Image(systemName: "clock.fill")
                             .foregroundColor(.blue)
-                    case "Postpone":
-                        Image(systemName: "hourglass")
-                            .foregroundColor(.orange)
                     default:
                         Image(systemName: "questionmark.circle")
                             .foregroundColor(.gray)
