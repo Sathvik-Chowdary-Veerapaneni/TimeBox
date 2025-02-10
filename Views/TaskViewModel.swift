@@ -122,6 +122,7 @@ class TaskViewModel: ObservableObject {
             
             if newStatus == "Done" {
                 HapticManager.successNotification()
+                
             }
             
             saveChanges()
