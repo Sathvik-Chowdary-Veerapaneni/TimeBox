@@ -175,7 +175,7 @@ struct CalendarView: View {
                                     // Flicker-free drag
                                     .onDrag(
                                         {
-                                            let taskID = task.objectID.uriRepresentation().absoluteString
+                                            let taskID = task.uriString
                                             return NSItemProvider(object: taskID as NSString)
                                         },
                                         preview: {
@@ -235,7 +235,7 @@ if tasksForSelectedDate.isEmpty {
                     // HapticManager.shared.playHaptic(.impactMedium)
                     
 
-                    let taskID = task.objectID.uriRepresentation().absoluteString
+                    let taskID = task.uriString
                     return NSItemProvider(object: taskID as NSString)
                 },
                 preview: {

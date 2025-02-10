@@ -5,8 +5,6 @@ import CoreData
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    
-    // Instead of your published tasks array, do a @FetchRequest:
     @FetchRequest(
         sortDescriptors: [
             NSSortDescriptor(keyPath: \TimeBox_Task.priorityRank, ascending: true),
@@ -16,7 +14,6 @@ struct ContentView: View {
     )
     private var todayTasks: FetchedResults<TimeBox_Task>
     
-    // If you need TaskViewModel for other things, you can still keep it:
     @EnvironmentObject var taskVM: TaskViewModel
     
     @State private var showingAddSheet = false

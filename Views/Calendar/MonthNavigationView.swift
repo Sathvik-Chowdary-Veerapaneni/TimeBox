@@ -6,8 +6,6 @@ struct MonthNavigationView: View {
     let currentMonth: Date
     let onPrev: () -> Void
     let onNext: () -> Void
-    
-    // Whether we're in backlog mode (to possibly hide month text)
     let showBacklog: Bool
     
     var body: some View {
@@ -16,7 +14,7 @@ struct MonthNavigationView: View {
             Spacer()
             
             if !showBacklog {
-                Text(formatMonth(currentMonth))
+                Text(DateUtils.formatMonth(currentMonth))
                     .font(.headline)
             } else {
                 Text("")  // hide text if backlog
@@ -27,12 +25,5 @@ struct MonthNavigationView: View {
             Button("Next >") { onNext() }
         }
         .padding()
-    }
-    
-    // Local helper for formatting the month
-    private func formatMonth(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "LLLL yyyy"
-        return formatter.string(from: date)
     }
 }

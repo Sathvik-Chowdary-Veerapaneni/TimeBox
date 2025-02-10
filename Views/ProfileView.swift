@@ -28,10 +28,10 @@ struct ProfileView: View {
             }
         }
         .onAppear {
-            applyThemeChoice(userThemeChoice)
+            UIApplication.shared.applyTheme(userThemeChoice)
         }
         .onChange(of: userThemeChoice) { newValue in
-            applyThemeChoice(newValue)
+            UIApplication.shared.applyTheme(newValue)
         }
     }
     

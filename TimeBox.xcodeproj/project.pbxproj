@@ -77,6 +77,11 @@
 			path = Challenges_Solving;
 			sourceTree = "<group>";
 		};
+		C28FE0582D5AC5370019DB3D /* Shared_ */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared_;
+			sourceTree = "<group>";
+		};
 		C2BA21C22D42CB95004320E4 /* Calendar */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Calendar;
@@ -137,6 +142,7 @@
 		C23730E42D2C89C900EBA542 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C28FE0582D5AC5370019DB3D /* Shared_ */,
 				C2BA21C22D42CB95004320E4 /* Calendar */,
 				C23730D32D2C88AE00EBA542 /* ContentView.swift */,
 				C2BDBA592D3C527D005E8E68 /* TaskRowCompact.swift */,
@@ -193,6 +199,7 @@
 			fileSystemSynchronizedGroups = (
 				C237308C2D2C85E700EBA542 /* TimeBox */,
 				C2513FF32D4055D3007B4C52 /* Challenges_Solving */,
+				C28FE0582D5AC5370019DB3D /* Shared_ */,
 				C2BA21C22D42CB95004320E4 /* Calendar */,
 			);
 			name = TimeBox;

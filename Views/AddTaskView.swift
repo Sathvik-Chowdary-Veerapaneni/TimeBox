@@ -27,12 +27,8 @@ struct AddTaskView: View {
                     
                     TextEditor(text: $desc)
                         .frame(height: 80)
-                        // <<< ADDED: Detect newline at the end
-                        .onChange(of: desc) { newValue in
-                            if newValue.count > oldDesc.count,      // typed something new
-                               newValue.hasSuffix("\n") {           // ends with newline
-                                desc += "- "                        // append dash+space
-                            }
+                        .onChange(of: desc) {newValue in
+                            desc=newValue.appendingDashIfNeeded(previous: oldDesc)
                             oldDesc = desc
                         }
                         .overlay(

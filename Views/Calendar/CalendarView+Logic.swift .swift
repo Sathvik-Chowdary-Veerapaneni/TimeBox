@@ -214,21 +214,14 @@ extension CalendarView {
             taskVM.deleteTask(task)
         }
     }
-    
-    /// Format a month, e.g. "January 2025"
-    func formatMonth(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "LLLL yyyy"
-        return formatter.string(from: date)
-    }
-    
-    /// Format a date for display (medium style)
-    func dateString(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        return formatter.string(from: date)
-    }
 
+    func formatMonth(_ date: Date) -> String {
+        return DateUtils.formatMonth(date)
+    }
+    func dateString(_ date: Date) -> String {
+        return DateUtils.formatDate(date)
+    }
+    
     func highlightMatches(in fullText: String, searchText: String) -> Text {
         guard !fullText.isEmpty, !searchText.isEmpty else {
             return Text(fullText)

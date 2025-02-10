@@ -24,7 +24,7 @@ struct DayTasksListView: View {
                     // DRAG
                     .onDrag(
                         {
-                            let taskID = task.objectID.uriRepresentation().absoluteString
+                            let taskID = task.uriString
                             return NSItemProvider(object: taskID as NSString)
                         },
                         preview: {

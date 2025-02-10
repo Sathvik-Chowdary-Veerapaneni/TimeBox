@@ -23,15 +23,10 @@ struct TaskDescriptionPopup: View {
                     TextEditor(text: Binding(
                         get: { task.desc ?? "" },
                         set: { newValue in
-                            // If user typed something new, check for newline at the end
-                            if newValue.count > (task.desc ?? "").count,
-                               newValue.hasSuffix("\n") {
-                                task.desc = newValue + "- "
-                            } else {
-                                task.desc = newValue
-                            }
+                            task.desc = newValue.appendingDashIfNeeded(previous: task.desc ?? "")
                         }
-                    ))
+                    )
+                )
                     .frame(minHeight: 80)
                 }
                 
