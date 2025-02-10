@@ -96,11 +96,9 @@ struct AddTaskView: View {
             let maxIndex = unpinnedTasks.map { $0.sortIndex }.max() ?? 0
             newTask.sortIndex = maxIndex + 1
             try viewContext.save()
+            HapticManager.successNotification()
             CalendarService.shared.addEvent(for: newTask, in: viewContext)
             taskVM.fetchTasks()
-            
-            HapticManager.successNotification()
-            
             dismiss()
         } catch {
             print("Error saving new task: \(error.localizedDescription)")

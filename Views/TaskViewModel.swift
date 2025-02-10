@@ -103,10 +103,14 @@ class TaskViewModel: ObservableObject {
         let oldStatus = task.status ?? ""
         withAnimation {
             task.status = newStatus
+            
+            // Record time if going InProgress
             if oldStatus != "InProgress" && newStatus == "InProgress" {
                 task.inProgressStartTime = Date()
             }
-            else if oldStatus == "InProgress" && newStatus == "Done" {
+            
+            // If transitioning from InProgress -> Done, check elapsed time
+            if oldStatus == "InProgress" && newStatus == "Done" {
                 if let startTime = task.inProgressStartTime {
                     let elapsed = Date().timeIntervalSince(startTime) / 3600.0
                     if elapsed >= task.timeAllocated {
@@ -114,6 +118,10 @@ class TaskViewModel: ObservableObject {
                         congratsMessage = "Great job completing '\(task.title ?? "Untitled")'!"
                     }
                 }
+            }
+            
+            if newStatus == "Done" {
+                HapticManager.successNotification()
             }
             
             saveChanges()

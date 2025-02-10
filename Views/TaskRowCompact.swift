@@ -192,6 +192,7 @@ struct TaskRowCompact: View {
         }
         
         .onTapGesture {
+            HapticManager.lightImpact()
             tapped(task)
         }
 //        .sheet(isPresented: $showResolutionPopup) {
