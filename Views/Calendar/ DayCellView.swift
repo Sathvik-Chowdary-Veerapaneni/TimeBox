@@ -46,7 +46,7 @@ struct DayCellView: View {
                    .onDrop(of: [UTType.plainText], isTargeted: $isTargeted) { providers in
                        if isPast { return false }
                        guard let provider = providers.first else { return false }
-                       provider.loadObject(ofClass: String.self) { objectIDString, error in
+                       _ = provider.loadObject(ofClass: String.self) { objectIDString, error in
                            if let error = error { print("DayCellView error:", error); return }
                            guard let objectIDString = objectIDString else { return }
                            DispatchQueue.main.async {

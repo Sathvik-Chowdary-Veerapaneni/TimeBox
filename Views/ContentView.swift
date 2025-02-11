@@ -42,18 +42,7 @@ struct ContentView: View {
                             .font(.title2)
                             .padding(.leading, 40)
                     }
-                    
-                    // Calendar_Integration
-                    // New button for Hourly Schedule
-                    Button {
-                        showHourlySchedule = true
-                        print("New button tapped")
-                    } label: {
-                        Image(systemName: "star")
-                            .font(.title2)
-                            .padding(.leading, 40)
-                    }
-                    
+
                     Spacer()
                     
                     Text("HOME")
@@ -105,9 +94,6 @@ struct ContentView: View {
             
         }
         // SHEETS
-        .sheet(isPresented: $showHourlySchedule) {
-            HourlyScheduleView()
-        }
         .sheet(isPresented: $showCalendar) {
             CalendarView()
                 .environment(\.managedObjectContext, viewContext)

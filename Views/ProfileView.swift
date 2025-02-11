@@ -36,13 +36,16 @@ struct ProfileView: View {
     }
     
     private func applyThemeChoice(_ choice: String) {
-        switch choice {
-        case "light":
-            UIApplication.shared.windows.first?.overrideUserInterfaceStyle = .light
-        case "dark":
-            UIApplication.shared.windows.first?.overrideUserInterfaceStyle = .dark
-        default:
-            UIApplication.shared.windows.first?.overrideUserInterfaceStyle = .unspecified
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = windowScene.windows.first {
+            switch choice {
+            case "light":
+                window.overrideUserInterfaceStyle = .light
+            case "dark":
+                window.overrideUserInterfaceStyle = .dark
+            default:
+                window.overrideUserInterfaceStyle = .unspecified
+            }
         }
     }
 }

@@ -93,7 +93,7 @@ struct AddTaskView: View {
             newTask.sortIndex = maxIndex + 1
             try viewContext.save()
             HapticManager.successNotification()
-            CalendarService.shared.addEvent(for: newTask, in: viewContext)
+            _ = CalendarService.shared.addEvent(for: newTask, in: viewContext)
             taskVM.fetchTasks()
             dismiss()
         } catch {
