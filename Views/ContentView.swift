@@ -21,6 +21,7 @@ struct ContentView: View {
     
     @State private var showCalendar = false
     @State private var showProfileSheet = false
+    @State private var showHourlySchedule = false
     
     var body: some View {
         let sortedTodayTasks = Array(todayTasks).sorted { a, b in
@@ -38,6 +39,17 @@ struct ContentView: View {
                         showCalendar.toggle()
                     } label: {
                         Image(systemName: "calendar")
+                            .font(.title2)
+                            .padding(.leading, 40)
+                    }
+                    
+                    // Calendar_Integration
+                    // New button for Hourly Schedule
+                    Button {
+                        showHourlySchedule = true
+                        print("New button tapped")
+                    } label: {
+                        Image(systemName: "star")
                             .font(.title2)
                             .padding(.leading, 40)
                     }
@@ -93,6 +105,9 @@ struct ContentView: View {
             
         }
         // SHEETS
+        .sheet(isPresented: $showHourlySchedule) {
+            HourlyScheduleView()
+        }
         .sheet(isPresented: $showCalendar) {
             CalendarView()
                 .environment(\.managedObjectContext, viewContext)
@@ -161,5 +176,14 @@ struct ContentView: View {
         } catch {
             print("Error saving: \(error.localizedDescription)")
         }
+    }
+}
+
+
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+            .environment(\.managedObjectContext, PersistenceController.shared.container.viewContext)
+            .environmentObject(TaskViewModel(context: PersistenceController.shared.container.viewContext))
     }
 }
