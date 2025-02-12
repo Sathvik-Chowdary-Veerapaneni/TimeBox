@@ -14,9 +14,12 @@ struct TaskDescriptionPopup: View {
         NavigationView {
             Form {
                 Section(header: Text("Task")) {
-                    Text(task.title ?? "Untitled")
-                        .font(.headline)
-                        .fontWeight(.semibold)
+                    TextField("Enter task title", text: Binding(
+                        get: { task.title ?? "" },
+                        set: { task.title = $0 }
+                    ))
+                    .font(.headline)
+                    .fontWeight(.semibold)
                 }
                 
                 Section(header: Text("Description")) {
