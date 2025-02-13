@@ -10,7 +10,7 @@ struct ContentView: View {
             NSSortDescriptor(keyPath: \TimeBox_Task.priorityRank, ascending: true),
             NSSortDescriptor(keyPath: \TimeBox_Task.sortIndex, ascending: true)
         ],
-        predicate: .todayPredicate()  // from the extension in Predicates.swift
+        predicate: .todayPredicate()  // from the extension in Showing_Today_Tasks_ContentView_Predicates.swift
     )
     private var todayTasks: FetchedResults<TimeBox_Task>
     
