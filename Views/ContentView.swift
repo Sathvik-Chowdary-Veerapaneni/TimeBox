@@ -96,8 +96,8 @@ struct ContentView: View {
         .sheet(isPresented: $showCalendar) {
             CalendarView()
                 .environment(\.managedObjectContext, viewContext)
-                .presentationDetents([.medium, .large])
-                .presentationDragIndicator(.visible)
+                // .presentationDetents([.medium, .large])
+                // .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showProfileSheet) {
             ProfileView()
